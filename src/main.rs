@@ -9,10 +9,12 @@ fn main() -> Result<(), serde_json::error::Error> {
     //println!("{}", json);
 
     let sample: Graph<Data, Props> = serde_json::from_reader(std::io::stdin())?;
-    println!("{:?}", sample.node(0));
-    println!("{:?}", sample.data(0));
-    println!("{:?}", sample.edge(0));
-    println!("{:?}", sample.props(0));
+    println!("{:?}", sample.node(25));
+    println!("{:?}", sample.data(25));
+    println!("{:?}", sample.edge(99));
+    println!("{:?}", sample.props(99));
+    let path = sample.search(0,25);
+    println!("{:?}", path);
     Ok(())
 }
 

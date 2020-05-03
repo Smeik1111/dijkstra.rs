@@ -71,4 +71,7 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
         self.nodes[to].incoming.push(new_edge_id);
         return new_edge_id;
     }
+    pub fn search(&self, source: NodeId, target: NodeId) -> Vec<EdgeId> {
+        return Vec::new();
+    }
 }
