@@ -1,5 +1,4 @@
 extern crate rand;
-mod random;
 
 use std::fmt::{Debug, Display};
 
@@ -111,9 +110,9 @@ pub fn sample() -> Graph<SampleData, SampleProps> {
     }
     for _ in 0..100 {
         // random numbers of 0 to 25 as usize to use for node id's
-        let from = (random::u8() / 10) as usize;
-        let to = (random::u8() / 10) as usize;
-        let cost = random::u8();
+        let from = (rand::random::<u8>() / 10) as usize;
+        let to = (rand::random::<u8>() / 10) as usize;
+        let cost = rand::random::<u8>();
         graph.insert_edge(from, to, SampleProps { cost: cost });
     }
     return graph;
