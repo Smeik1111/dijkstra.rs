@@ -1,5 +1,3 @@
-extern crate rand;
-
 use std::fmt::{Debug, Display};
 
 // immutable graph, nodes and edges can be added but not deleted
@@ -98,44 +96,5 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
         }
         result += &"]}";
         result
-    }
-}
-
-// Sample graph with 26 nodes (letter of the alphabet)
-// and 100 random edges with random cost sampled from [0, 255].
-pub fn sample() -> Graph<SampleData, SampleProps> {
-    let mut graph = Graph::new();
-    for c in b'a'..=b'z' {
-        graph.insert_node(SampleData { name: c as char });
-    }
-    for _ in 0..100 {
-        // random numbers of 0 to 25 as usize to use for node id's
-        let from = (rand::random::<u8>() / 10) as usize;
-        let to = (rand::random::<u8>() / 10) as usize;
-        let cost = rand::random::<u8>();
-        graph.insert_edge(from, to, SampleProps { cost: cost });
-    }
-    return graph;
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct SampleData {
-    name: char,
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct SampleProps {
-    cost: u8,
-}
-
-impl Display for SampleData {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{{\"name\":\"{}\"}}", self.name)
-    }
-}
-
-impl Display for SampleProps {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{{\"cost\":{}}}", self.cost)
     }
 }
