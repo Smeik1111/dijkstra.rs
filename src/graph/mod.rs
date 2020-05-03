@@ -36,20 +36,20 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
             props: Vec::new(),
         }
     }
-    pub fn node(self: &Self, id: NodeId) -> &Node {
+    pub fn node(&self, id: NodeId) -> &Node {
         &self.nodes[id]
     }
-    pub fn data(self: &Self, id: NodeId) -> &Data {
+    pub fn data(&self, id: NodeId) -> &Data {
         &self.data[id]
     }
-    pub fn edge(self: &Self, id: EdgeId) -> &Edge {
+    pub fn edge(&self, id: EdgeId) -> &Edge {
         &self.edges[id]
     }
-    pub fn props(self: &Self, id: EdgeId) -> &Props {
+    pub fn props(&self, id: EdgeId) -> &Props {
         &self.props[id]
     }
 
-    pub fn insert_node(self: &mut Self, data: Data) -> usize {
+    pub fn insert_node(&mut self, data: Data) -> usize {
         let new_node_id = self.nodes.len();
         self.nodes.push(Node {
             id: new_node_id,
@@ -59,7 +59,7 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
         self.data.push(data);
         return new_node_id;
     }
-    pub fn insert_edge(self: &mut Self, from: usize, to: usize, props: Props) -> usize {
+    pub fn insert_edge(&mut self, from: usize, to: usize, props: Props) -> usize {
         let new_edge_id = self.edges.len();
         self.edges.push(Edge {
             id: new_edge_id,
