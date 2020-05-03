@@ -29,9 +29,9 @@ pub fn random_sample() -> Graph<Data, Props> {
         let from = (rand::random::<u8>() / 10) as usize;
         let to = (rand::random::<u8>() / 10) as usize;
         let cost = rand::random::<u8>();
-        graph.insert_edge(from, to, Props { cost: cost });
+        graph.insert_edge(from, to, Props { cost });
     }
-    return graph;
+    graph
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]

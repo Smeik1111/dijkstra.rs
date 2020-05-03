@@ -2,7 +2,7 @@ use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
 
 // immutable graph, nodes and edges can be added but not deleted
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Graph<Data: Debug, Props: Debug> {
     nodes: Vec<Node>,
     data: Vec<Data>,
@@ -28,7 +28,7 @@ type NodeId = usize;
 type EdgeId = usize;
 
 impl<Data: Debug, Props: Debug> Graph<Data, Props> {
-    pub fn new() -> Graph<Data, Props> {
+    pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
             data: Vec::new(),
@@ -57,21 +57,22 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
             outgoing: Vec::new(),
         });
         self.data.push(data);
-        return new_node_id;
+        new_node_id
     }
     pub fn insert_edge(&mut self, from: usize, to: usize, props: Props) -> usize {
         let new_edge_id = self.edges.len();
         self.edges.push(Edge {
             id: new_edge_id,
-            from: from,
-            to: to,
+            from,
+            to,
         });
         self.props.push(props);
         self.nodes[from].outgoing.push(new_edge_id);
         self.nodes[to].incoming.push(new_edge_id);
-        return new_edge_id;
+        new_edge_id
     }
-    pub fn search(&self, source: NodeId, target: NodeId) -> Vec<EdgeId> {
-        return Vec::new();
+    pub fn search(&self, _source: NodeId, _target: NodeId) -> Vec<EdgeId> {
+        // TODO
+        Vec::new()
     }
 }
