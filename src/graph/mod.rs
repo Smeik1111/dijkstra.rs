@@ -1,5 +1,5 @@
-use std::fmt::Debug;
 use serde::{Deserialize, Serialize};
+use std::fmt::Debug;
 
 // immutable graph, nodes and edges can be added but not deleted
 #[derive(Debug, Default, Deserialize, Serialize)]
