@@ -1,7 +1,8 @@
-use std::fmt::{Debug, Display};
+use std::fmt::Debug;
+use serde::{Deserialize, Serialize};
 
 // immutable graph, nodes and edges can be added but not deleted
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Graph<Data: Debug, Props: Debug> {
     nodes: Vec<Node>,
     data: Vec<Data>,
@@ -9,19 +10,22 @@ pub struct Graph<Data: Debug, Props: Debug> {
     props: Vec<Props>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Node {
-    pub id: usize,
-    pub incoming: Vec<usize>,
-    pub outgoing: Vec<usize>,
+    pub id: NodeId,
+    pub incoming: Vec<EdgeId>,
+    pub outgoing: Vec<EdgeId>,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Deserialize, Serialize)]
 pub struct Edge {
-    pub id: usize,
-    pub from: usize,
-    pub to: usize,
+    pub id: EdgeId,
+    pub from: NodeId,
+    pub to: NodeId,
 }
+
+type NodeId = usize;
+type EdgeId = usize;
 
 impl<Data: Debug, Props: Debug> Graph<Data, Props> {
     pub fn new() -> Graph<Data, Props> {
@@ -32,17 +36,17 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
             props: Vec::new(),
         }
     }
-    pub fn node(self: &Self, node_id: usize) -> &Node {
-        &self.nodes[node_id]
+    pub fn node(self: &Self, id: NodeId) -> &Node {
+        &self.nodes[id]
     }
-    pub fn data(self: &Self, node_id: usize) -> &Data {
-        &self.data[node_id]
+    pub fn data(self: &Self, id: NodeId) -> &Data {
+        &self.data[id]
     }
-    pub fn edge(self: &Self, edge_id: usize) -> &Edge {
-        &self.edges[edge_id]
+    pub fn edge(self: &Self, id: EdgeId) -> &Edge {
+        &self.edges[id]
     }
-    pub fn props(self: &Self, edge_id: usize) -> &Props {
-        &self.props[edge_id]
+    pub fn props(self: &Self, id: EdgeId) -> &Props {
+        &self.props[id]
     }
 
     pub fn insert_node(self: &mut Self, data: Data) -> usize {
@@ -66,35 +70,5 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
         self.nodes[from].outgoing.push(new_edge_id);
         self.nodes[to].incoming.push(new_edge_id);
         return new_edge_id;
-    }
-    pub fn json(&self) -> String
-    where
-        Data: Display,
-        Props: Display,
-    {
-        let mut result = "{\"nodes\":[".to_string();
-        for id in 0..self.nodes.len() {
-            result += &format!("{}", self.data[id]);
-            if id < self.nodes.len() - 1 {
-                result += &",";
-            }
-        }
-        result += &"],";
-        result += &"\"edges\":[";
-        for id in 0..self.edges.len() {
-            let edge = &self.edges[id];
-            let props = &self.props[id];
-            let from = &self.nodes[edge.from];
-            let to = &self.nodes[edge.to];
-            result += &format!(
-                "{{\"from\":{},\"to\":{},\"props\":{}}}",
-                self.data[from.id], self.data[to.id], props
-            );
-            if id < self.edges.len() - 1 {
-                result += &",";
-            }
-        }
-        result += &"]}";
-        result
     }
 }
