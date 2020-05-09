@@ -3,9 +3,9 @@ use std::fmt::Debug;
 
 // immutable graph, nodes and edges can be added but not deleted
 #[derive(Debug, Default, Deserialize, Serialize)]
-pub struct Graph<Data: Debug, Props: Debug> {
+pub struct Graph<State: Debug, Props: Debug> {
     nodes: Vec<Node>,
-    data: Vec<Data>,
+    states: Vec<State>,
     edges: Vec<Edge>,
     props: Vec<Props>,
 }
@@ -27,11 +27,11 @@ pub struct Edge {
 type NodeId = usize;
 type EdgeId = usize;
 
-impl<Data: Debug, Props: Debug> Graph<Data, Props> {
+impl<State: Debug, Props: Debug> Graph<State, Props> {
     pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
-            data: Vec::new(),
+            states: Vec::new(),
             edges: Vec::new(),
             props: Vec::new(),
         }
@@ -39,8 +39,8 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
     pub fn node(&self, id: NodeId) -> &Node {
         &self.nodes[id]
     }
-    pub fn data(&self, id: NodeId) -> &Data {
-        &self.data[id]
+    pub fn state(&self, id: NodeId) -> &State {
+        &self.states[id]
     }
     pub fn edge(&self, id: EdgeId) -> &Edge {
         &self.edges[id]
@@ -49,14 +49,14 @@ impl<Data: Debug, Props: Debug> Graph<Data, Props> {
         &self.props[id]
     }
 
-    pub fn insert_node(&mut self, data: Data) -> usize {
+    pub fn insert_node(&mut self, state: State) -> usize {
         let new_node_id = self.nodes.len();
         self.nodes.push(Node {
             id: new_node_id,
             incoming: Vec::new(),
             outgoing: Vec::new(),
         });
-        self.data.push(data);
+        self.states.push(state);
         new_node_id
     }
     pub fn insert_edge(&mut self, from: usize, to: usize, props: Props) -> usize {
