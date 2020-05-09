@@ -10,14 +10,14 @@ pub struct Graph<State: Debug, Props: Debug> {
     props: Vec<Props>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Node {
     pub id: NodeId,
     pub incoming: Vec<EdgeId>,
     pub outgoing: Vec<EdgeId>,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, Deserialize, Serialize)]
+#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Edge {
     pub id: EdgeId,
     pub from: NodeId,
