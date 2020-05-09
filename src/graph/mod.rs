@@ -17,7 +17,7 @@ pub struct Node {
     pub outgoing: Vec<EdgeId>,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Deserialize, Serialize)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Edge {
     pub id: EdgeId,
     pub from: NodeId,

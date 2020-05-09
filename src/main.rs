@@ -28,18 +28,18 @@ pub fn random_sample() -> Graph<State, Props> {
     for _ in 0..100 {
         let from = (rand::random::<u8>() / 10) as usize;
         let to = (rand::random::<u8>() / 10) as usize;
-        let cost = rand::random::<f32>();
+        let cost = rand::random::<f64>();
         graph.insert_edge(from, to, Props { cost });
     }
     graph
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct State {
     name: char,
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Props {
-    cost: f32,
+    cost: f64,
 }
