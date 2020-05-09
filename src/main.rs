@@ -4,9 +4,9 @@ use graph::Graph;
 use serde::{Deserialize, Serialize};
 
 fn main() -> Result<(), serde_json::error::Error> {
-    let sample = random_sample();
-    let json = serde_json::to_string(&sample)?;
-    println!("{}", json);
+    // let sample = random_sample();
+    // let json = serde_json::to_string(&sample)?;
+    // println!("{}", json);
 
     let sample: Graph<State, Props> = serde_json::from_reader(std::io::stdin())?;
     println!("{:?}", sample.node(25));
