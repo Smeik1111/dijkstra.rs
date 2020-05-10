@@ -4,7 +4,7 @@ struct Heap {
     nodes: Vec<Node>,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 struct Node {
     id: usize,
     cost: f64,
