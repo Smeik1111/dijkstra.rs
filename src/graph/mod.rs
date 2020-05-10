@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 
-mod heap;
+mod priority_queue;
 
 // immutable graph, nodes and edges can be added but not deleted
 #[derive(Debug, Default, Deserialize, Serialize)]

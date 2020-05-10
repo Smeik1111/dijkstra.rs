@@ -1,6 +1,4 @@
 // priority queue based on binary heap for efficient access to id with the lowest cost
-type PriorityQueue = Heap;
-
 #[derive(Debug)]
 struct Heap {
     nodes: Vec<Node>,
@@ -99,7 +97,7 @@ mod tests {
 
     #[test]
     fn test() {
-        let mut heap = PriorityQueue::new();
+        let mut heap = Heap::new();
         heap.push(1, 0.3);
         heap.push(2, 0.5);
         heap.push(3, 0.7);
@@ -109,7 +107,7 @@ mod tests {
         heap.push(7, 0.6);
         heap.push(8, 0.2);
         heap.push(9, 0.1);
-        
+
         assert_eq!(heap.pop(), Some((9, 0.1)));
         assert_eq!(heap.pop(), Some((8, 0.2)));
         assert_eq!(heap.pop(), Some((1, 0.3)));
