@@ -1,7 +1,8 @@
-// priority queue based on binary heap
-// for efficient access to id with the lowest cost
+// priority queue based on binary heap for efficient access to id with the lowest cost
+type PriorityQueue = Heap;
+
 #[derive(Debug)]
-pub struct Heap {
+struct Heap {
     nodes: Vec<Node>,
 }
 
@@ -15,11 +16,11 @@ impl Heap {
     pub fn new() -> Self {
         Heap { nodes: Vec::new() }
     }
-    pub fn put(&mut self, id: usize, cost: f64) {
+    pub fn push(&mut self, id: usize, cost: f64) {
         self.nodes.push(Node { id, cost });
         self.promote(self.nodes.len() - 1);
     }
-    pub fn take(&mut self) -> Option<(usize, f64)> {
+    pub fn pop(&mut self) -> Option<(usize, f64)> {
         match self.nodes.len() {
             0 => None,
             1 => {
@@ -98,26 +99,26 @@ mod tests {
 
     #[test]
     fn test() {
-        let mut heap = Heap::new();
-        heap.put(1, 0.3);
-        heap.put(2, 0.5);
-        heap.put(3, 0.7);
-        heap.put(4, 0.9);
-        heap.put(5, 0.4);
-        heap.put(6, 0.8);
-        heap.put(7, 0.6);
-        heap.put(8, 0.2);
-        heap.put(9, 0.1);
+        let mut heap = PriorityQueue::new();
+        heap.push(1, 0.3);
+        heap.push(2, 0.5);
+        heap.push(3, 0.7);
+        heap.push(4, 0.9);
+        heap.push(5, 0.4);
+        heap.push(6, 0.8);
+        heap.push(7, 0.6);
+        heap.push(8, 0.2);
+        heap.push(9, 0.1);
         
-        assert_eq!(heap.take(), Some((9, 0.1)));
-        assert_eq!(heap.take(), Some((8, 0.2)));
-        assert_eq!(heap.take(), Some((1, 0.3)));
-        assert_eq!(heap.take(), Some((5, 0.4)));
-        assert_eq!(heap.take(), Some((2, 0.5)));
-        assert_eq!(heap.take(), Some((7, 0.6)));
-        assert_eq!(heap.take(), Some((3, 0.7)));
-        assert_eq!(heap.take(), Some((6, 0.8)));
-        assert_eq!(heap.take(), Some((4, 0.9)));
-        assert_eq!(heap.take(), None);
+        assert_eq!(heap.pop(), Some((9, 0.1)));
+        assert_eq!(heap.pop(), Some((8, 0.2)));
+        assert_eq!(heap.pop(), Some((1, 0.3)));
+        assert_eq!(heap.pop(), Some((5, 0.4)));
+        assert_eq!(heap.pop(), Some((2, 0.5)));
+        assert_eq!(heap.pop(), Some((7, 0.6)));
+        assert_eq!(heap.pop(), Some((3, 0.7)));
+        assert_eq!(heap.pop(), Some((6, 0.8)));
+        assert_eq!(heap.pop(), Some((4, 0.9)));
+        assert_eq!(heap.pop(), None);
     }
 }
