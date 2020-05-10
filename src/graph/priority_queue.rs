@@ -22,8 +22,7 @@ impl Heap {
         match self.nodes.len() {
             0 => None,
             1 => {
-                let node = self.nodes[0].clone();
-                self.nodes.pop();
+                let node = self.nodes.pop().unwrap();
                 Some((node.id, node.cost))
             }
             _ => {
