@@ -1,6 +1,6 @@
 // priority queue based on binary heap for efficient access to id with the lowest cost
 #[derive(Debug)]
-struct Heap {
+pub struct Heap {
     nodes: Vec<Node>,
 }
 
@@ -10,26 +10,35 @@ struct Node {
     cost: f64,
 }
 
+impl Node {
+    fn tuple(&self) -> (usize, f64) {
+        (self.id, self.cost)
+    }
+}
+
 impl Heap {
     pub fn new() -> Self {
         Heap { nodes: Vec::new() }
     }
-    pub fn push(&mut self, id: usize, cost: f64) {
+    pub fn is_empty(&self) -> bool {
+        self.nodes.is_empty()
+    }
+    pub fn insert(&mut self, id: usize, cost: f64) {
         self.nodes.push(Node { id, cost });
         self.promote(self.nodes.len() - 1);
     }
-    pub fn pop(&mut self) -> Option<(usize, f64)> {
+    pub fn extract_min(&mut self) -> Option<(usize, f64)> {
         match self.nodes.len() {
             0 => None,
             1 => {
                 let node = self.nodes.pop().unwrap();
-                Some((node.id, node.cost))
+                Some(node.tuple())
             }
             _ => {
                 let node = self.nodes[0].clone();
                 self.nodes[0] = self.nodes.pop().unwrap();
                 self.demote(0);
-                Some((node.id, node.cost))
+                Some(node.tuple())
             }
         }
     }
@@ -97,25 +106,25 @@ mod tests {
     #[test]
     fn test() {
         let mut heap = Heap::new();
-        heap.push(1, 0.3);
-        heap.push(2, 0.5);
-        heap.push(3, 0.7);
-        heap.push(4, 0.9);
-        heap.push(5, 0.4);
-        heap.push(6, 0.8);
-        heap.push(7, 0.6);
-        heap.push(8, 0.2);
-        heap.push(9, 0.1);
+        heap.insert(1, 0.3);
+        heap.insert(2, 0.5);
+        heap.insert(3, 0.7);
+        heap.insert(4, 0.9);
+        heap.insert(5, 0.4);
+        heap.insert(6, 0.8);
+        heap.insert(7, 0.6);
+        heap.insert(8, 0.2);
+        heap.insert(9, 0.1);
 
-        assert_eq!(heap.pop(), Some((9, 0.1)));
-        assert_eq!(heap.pop(), Some((8, 0.2)));
-        assert_eq!(heap.pop(), Some((1, 0.3)));
-        assert_eq!(heap.pop(), Some((5, 0.4)));
-        assert_eq!(heap.pop(), Some((2, 0.5)));
-        assert_eq!(heap.pop(), Some((7, 0.6)));
-        assert_eq!(heap.pop(), Some((3, 0.7)));
-        assert_eq!(heap.pop(), Some((6, 0.8)));
-        assert_eq!(heap.pop(), Some((4, 0.9)));
-        assert_eq!(heap.pop(), None);
+        assert_eq!(heap.extract_min(), Some((9, 0.1)));
+        assert_eq!(heap.extract_min(), Some((8, 0.2)));
+        assert_eq!(heap.extract_min(), Some((1, 0.3)));
+        assert_eq!(heap.extract_min(), Some((5, 0.4)));
+        assert_eq!(heap.extract_min(), Some((2, 0.5)));
+        assert_eq!(heap.extract_min(), Some((7, 0.6)));
+        assert_eq!(heap.extract_min(), Some((3, 0.7)));
+        assert_eq!(heap.extract_min(), Some((6, 0.8)));
+        assert_eq!(heap.extract_min(), Some((4, 0.9)));
+        assert_eq!(heap.extract_min(), None);
     }
 }

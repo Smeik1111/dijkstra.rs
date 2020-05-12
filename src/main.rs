@@ -13,8 +13,9 @@ fn main() -> Result<(), serde_json::error::Error> {
     println!("{:?}", sample.state(25));
     println!("{:?}", sample.edge(99));
     println!("{:?}", sample.props(99));
-    let path = sample.search(0, 25);
-    println!("{:?}", path);
+    if let Some(path) = sample.search(0, 25) {
+        println!("{:?}", path);
+    }
     Ok(())
 }
 
@@ -42,4 +43,10 @@ pub struct State {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Props {
     cost: f64,
+}
+
+impl graph::Cost for Props {
+    fn cost(&self) -> f64 {
+        self.cost
+    }
 }
