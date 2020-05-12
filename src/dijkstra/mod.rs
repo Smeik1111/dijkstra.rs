@@ -4,7 +4,8 @@ use std::fmt::Debug;
 
 mod priority_queue;
 
-// immutable graph, nodes and edges can be added but not deleted
+// data-oriented graph with user-defined node states and edge props;
+// nodes and edges can be inserted but not deleted
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Graph<NodeState: Debug, EdgeProps: Debug> {
     nodes: Vec<Node>,
@@ -88,7 +89,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         if targets.contains(&source) {
             return Some(Vec::new());
         }
-        // from the source use breadth-first search to find the cheapest incoming edge for each node
+        // from the source, use breadth-first search to find the cheapest incoming edge for each node
         let mut cheapest_incoming: Vec<Option<Incoming>> = vec![None; self.nodes.len()];
         let mut is_closed: Vec<bool> = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::new();
@@ -108,6 +109,8 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                 if cheapest_incoming[to].is_none() || incoming < cheapest_incoming[to].unwrap() {
                     cheapest_incoming[to] = Some(incoming);
                     queue.insert(to, to_cost);
+                    // the queue might still have the old more expensive items for 'to',
+                    // but they will be discarded when they eventually get to the front of the queue
                 }
             }
         }
@@ -134,12 +137,16 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 struct Incoming(EdgeId, CostType);
+
+// PartialOrd is needed to be able to compare Incoming values in breadth-first search
 impl PartialOrd for Incoming {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         // compare cost
         self.1.partial_cmp(&other.1)
     }
 }
+
+// Ord is needed to be able to use Incoming values in min_by_key
 impl Eq for Incoming {}
 impl Ord for Incoming {
     fn cmp(&self, other: &Self) -> Ordering {
