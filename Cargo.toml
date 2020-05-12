@@ -1,5 +1,5 @@
 [package]
-name = "graph"
+name = "dijkstra"
 version = "0.1.0"
 authors = ["Andrey Sokolov <andsok75@fastmail.com>"]
 edition = "2018"
