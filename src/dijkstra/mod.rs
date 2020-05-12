@@ -82,7 +82,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         if source == target {
             return Some(Vec::new());
         }
-        let mut best_incoming: Vec<Option<BestIncoming>> = vec![None; self.nodes.len()];
+        let mut best_incoming: Vec<Option<(EdgeId, CostType)>> = vec![None; self.nodes.len()];
         let mut is_closed: Vec<bool> = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::new();
         let source_cost = 0.0;
@@ -97,11 +97,11 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                 }
                 let to_cost = from_cost + self.props[edge_id].cost();
                 match best_incoming[to] {
-                    Some(BestIncoming(_, cost)) if cost <= to_cost => {
+                    Some((_, cost)) if cost <= to_cost => {
                         continue;
                     }
                     _ => {
-                        best_incoming[to] = Some(BestIncoming(edge_id, to_cost));
+                        best_incoming[to] = Some((edge_id, to_cost));
                         queue.insert(to, to_cost);
                     }
                 }
@@ -113,7 +113,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         let mut path = Vec::new();
         let mut node_id = target;
         while node_id != source {
-            if let Some(BestIncoming(edge_id, _)) = best_incoming[node_id] {
+            if let Some((edge_id, _)) = best_incoming[node_id] {
                 path.push(edge_id);
                 node_id = self.edges[edge_id].from;
             } else {
@@ -124,6 +124,3 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         Some(path)
     }
 }
-
-#[derive(Debug, Clone)]
-struct BestIncoming(EdgeId, CostType);
