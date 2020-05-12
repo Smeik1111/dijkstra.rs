@@ -83,13 +83,18 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
             return Some(Vec::new());
         }
         let mut best_incoming: Vec<Option<BestIncoming>> = vec![None; self.nodes.len()];
+        let mut is_closed: Vec<bool> = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::new();
         let source_cost = 0.0;
         queue.insert(source, source_cost);
         while !queue.is_empty() {
             let (from, from_cost) = queue.extract_min().unwrap();
+            is_closed[from] = true;
             for &edge_id in self.nodes[from].outgoing.iter() {
                 let to = self.edges[edge_id].to;
+                if is_closed[to] {
+                    continue;
+                }
                 let to_cost = from_cost + self.props[edge_id].cost();
                 match best_incoming[to] {
                     Some(BestIncoming(_, cost)) if cost <= to_cost => {
