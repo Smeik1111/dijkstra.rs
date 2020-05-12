@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
+use std::cmp::{Ord, PartialOrd, Ordering};
 
 mod priority_queue;
 
@@ -55,7 +56,9 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn props(&self, id: EdgeId) -> &EdgeProps {
         &self.props[id]
     }
-
+    pub fn cost(&self, path: &[EdgeId]) -> CostType {
+        path.iter().cloned().map(|edge_id| self.props[edge_id].cost()).sum()
+    }
     pub fn insert_node(&mut self, state: NodeState) -> NodeId {
         let new_node_id = self.nodes.len();
         self.nodes.push(Node {
@@ -78,11 +81,11 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         self.nodes[to].incoming.push(new_edge_id);
         new_edge_id
     }
-    pub fn cheapest_path(&self, source: NodeId, target: NodeId) -> Option<Vec<EdgeId>> {
-        if source == target {
+    pub fn cheapest_path(&self, source: NodeId, targets: &[NodeId]) -> Option<Vec<EdgeId>> {
+        if targets.contains(&source){
             return Some(Vec::new());
         }
-        let mut best_incoming: Vec<Option<(EdgeId, CostType)>> = vec![None; self.nodes.len()];
+        let mut best_incoming: Vec<Option<Incoming>> = vec![None; self.nodes.len()];
         let mut is_closed: Vec<bool> = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::new();
         let source_cost = 0.0;
@@ -96,24 +99,20 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                     continue;
                 }
                 let to_cost = from_cost + self.props[edge_id].cost();
-                match best_incoming[to] {
-                    Some((_, cost)) if cost <= to_cost => {
-                        continue;
-                    }
-                    _ => {
-                        best_incoming[to] = Some((edge_id, to_cost));
-                        queue.insert(to, to_cost);
-                    }
+                let incoming = Incoming(edge_id, to_cost);
+                if best_incoming[to].is_none() || incoming < best_incoming[to].unwrap() {
+                    best_incoming[to] = Some(incoming);
+                    queue.insert(to, to_cost);
                 }
             }
         }
-        if best_incoming[target].is_none() {
-            return None;
-        }
+        let cheapest_target: Option<NodeId> = targets.iter().cloned()
+            .filter(|&target| best_incoming[target].is_some())
+            .min_by_key(|&target| best_incoming[target].unwrap());
+        let mut node_id = cheapest_target?;
         let mut path = Vec::new();
-        let mut node_id = target;
         while node_id != source {
-            if let Some((edge_id, _)) = best_incoming[node_id] {
+            if let Some(Incoming(edge_id, _)) = best_incoming[node_id] {
                 path.push(edge_id);
                 node_id = self.edges[edge_id].from;
             } else {
@@ -122,5 +121,22 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         }
         path.reverse();
         Some(path)
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq)]
+struct Incoming(EdgeId, CostType);
+impl PartialOrd for Incoming {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.1.partial_cmp(&other.1)
+    }
+}
+impl Eq for Incoming {}
+impl Ord for Incoming {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match self.partial_cmp(&other) {
+            Some(Ordering::Less) => Ordering::Less,
+            _ => Ordering::Greater,
+        }
     }
 }
