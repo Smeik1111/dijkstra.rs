@@ -84,8 +84,9 @@ impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
         }
         let mut best_incoming: Vec<Option<BestIncoming>> = vec![None; self.nodes.len()];
         let mut queue = priority_queue::Heap::new();
-        queue.insert(source, 0.0);
-        while ! queue.is_empty() {
+        let source_cost = 0.0;
+        queue.insert(source, source_cost);
+        while !queue.is_empty() {
             let (from, from_cost) = queue.extract_min().unwrap();
             for &edge_id in self.nodes[from].outgoing.iter() {
                 let to = self.edges[edge_id].to;
@@ -101,7 +102,7 @@ impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
                 }
             }
         }
-        if !best_incoming[target].is_some() {
+        if best_incoming[target].is_none() {
             return None;
         }
         let mut path: Vec<EdgeId> = Vec::new();
