@@ -5,11 +5,11 @@ mod priority_queue;
 
 // immutable graph, nodes and edges can be added but not deleted
 #[derive(Debug, Default, Deserialize, Serialize)]
-pub struct Graph<State: Debug, Props: Debug> {
+pub struct Graph<NodeState: Debug, EdgeProps: Debug> {
     nodes: Vec<Node>,
-    states: Vec<State>,
+    states: Vec<NodeState>,
     edges: Vec<Edge>,
-    props: Vec<Props>,
+    props: Vec<EdgeProps>,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
@@ -34,7 +34,7 @@ type NodeId = usize;
 type EdgeId = usize;
 type CostType = f64;
 
-impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
+impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
@@ -46,17 +46,17 @@ impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
     pub fn node(&self, id: NodeId) -> &Node {
         &self.nodes[id]
     }
-    pub fn state(&self, id: NodeId) -> &State {
+    pub fn state(&self, id: NodeId) -> &NodeState {
         &self.states[id]
     }
     pub fn edge(&self, id: EdgeId) -> &Edge {
         &self.edges[id]
     }
-    pub fn props(&self, id: EdgeId) -> &Props {
+    pub fn props(&self, id: EdgeId) -> &EdgeProps {
         &self.props[id]
     }
 
-    pub fn insert_node(&mut self, state: State) -> usize {
+    pub fn insert_node(&mut self, state: NodeState) -> NodeId {
         let new_node_id = self.nodes.len();
         self.nodes.push(Node {
             id: new_node_id,
@@ -66,7 +66,7 @@ impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
         self.states.push(state);
         new_node_id
     }
-    pub fn insert_edge(&mut self, from: usize, to: usize, props: Props) -> usize {
+    pub fn insert_edge(&mut self, from: NodeId, to: NodeId, props: EdgeProps) -> EdgeId {
         let new_edge_id = self.edges.len();
         self.edges.push(Edge {
             id: new_edge_id,

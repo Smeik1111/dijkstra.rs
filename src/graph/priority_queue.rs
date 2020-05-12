@@ -1,44 +1,38 @@
 // priority queue based on binary heap for efficient access to id with the lowest cost
 #[derive(Debug)]
 pub struct Heap {
-    nodes: Vec<Node>,
+    items: Vec<Item>,
 }
 
 #[derive(Debug, Clone)]
-struct Node {
+struct Item {
     id: usize,
     cost: f64,
 }
 
-impl Node {
-    fn tuple(&self) -> (usize, f64) {
-        (self.id, self.cost)
-    }
-}
-
 impl Heap {
     pub fn new() -> Self {
-        Heap { nodes: Vec::new() }
+        Heap { items: Vec::new() }
     }
     pub fn is_empty(&self) -> bool {
-        self.nodes.is_empty()
+        self.items.is_empty()
     }
     pub fn insert(&mut self, id: usize, cost: f64) {
-        self.nodes.push(Node { id, cost });
-        self.promote(self.nodes.len() - 1);
+        self.items.push(Item { id, cost });
+        self.promote(self.items.len() - 1);
     }
     pub fn extract_min(&mut self) -> Option<(usize, f64)> {
-        match self.nodes.len() {
+        match self.items.len() {
             0 => None,
             1 => {
-                let node = self.nodes.pop().unwrap();
-                Some(node.tuple())
+                let item = self.items.pop().unwrap();
+                Some((item.id, item.cost))
             }
             _ => {
-                let node = self.nodes[0].clone();
-                self.nodes[0] = self.nodes.pop().unwrap();
+                let item = self.items[0].clone();
+                self.items[0] = self.items.pop().unwrap();
                 self.demote(0);
-                Some(node.tuple())
+                Some((item.id, item.cost))
             }
         }
     }
@@ -47,14 +41,14 @@ impl Heap {
         loop {
             match self.children(parent) {
                 (Some(left), Some(right))
-                    if self.nodes[right].cost < self.nodes[left].cost
-                        && self.nodes[parent].cost > self.nodes[right].cost =>
+                    if self.items[right].cost < self.items[left].cost
+                        && self.items[parent].cost > self.items[right].cost =>
                 {
-                    self.nodes.swap(parent, right);
+                    self.items.swap(parent, right);
                     parent = right;
                 }
-                (Some(left), _) if self.nodes[parent].cost > self.nodes[left].cost => {
-                    self.nodes.swap(parent, left);
+                (Some(left), _) if self.items[parent].cost > self.items[left].cost => {
+                    self.items.swap(parent, left);
                     parent = left;
                 }
                 _ => {
@@ -67,8 +61,8 @@ impl Heap {
     fn promote(&mut self, mut child: usize) {
         loop {
             match self.parent(child) {
-                Some(parent) if self.nodes[child].cost < self.nodes[parent].cost => {
-                    self.nodes.swap(child, parent);
+                Some(parent) if self.items[child].cost < self.items[parent].cost => {
+                    self.items.swap(child, parent);
                     child = parent;
                 }
                 _ => {
@@ -87,8 +81,8 @@ impl Heap {
     fn children(&self, parent: usize) -> (Option<usize>, Option<usize>) {
         let left = 2 * parent + 1;
         let right = left + 1;
-        if left < self.nodes.len() {
-            if right < self.nodes.len() {
+        if left < self.items.len() {
+            if right < self.items.len() {
                 (Some(left), Some(right))
             } else {
                 (Some(left), None)
