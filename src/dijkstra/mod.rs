@@ -28,15 +28,15 @@ pub struct Edge {
     pub to: NodeId,
 }
 
-pub trait Cost {
-    fn cost(&self) -> CostType;
+pub trait EdgeCost {
+    fn cost(&self) -> Cost;
 }
 
 type NodeId = usize;
 type EdgeId = usize;
-type CostType = f64;
+type Cost = f64;
 
-impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
+impl<NodeState: Debug, EdgeProps: Debug + EdgeCost> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
@@ -57,7 +57,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn props(&self, id: EdgeId) -> &EdgeProps {
         &self.props[id]
     }
-    pub fn cost(&self, path: &[EdgeId]) -> CostType {
+    pub fn cost(&self, path: &[EdgeId]) -> Cost {
         path.iter()
             .cloned()
             .map(|edge_id| self.props[edge_id].cost())
@@ -136,7 +136,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
 }
 
 #[derive(Debug, Copy, Clone, PartialEq)]
-struct Incoming(EdgeId, CostType);
+struct Incoming(EdgeId, Cost);
 
 // PartialOrd is needed to be able to compare Incoming values in breadth-first search
 impl PartialOrd for Incoming {

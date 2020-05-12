@@ -46,7 +46,7 @@ pub struct Props {
     cost: f64,
 }
 
-impl dijkstra::Cost for Props {
+impl dijkstra::EdgeCost for Props {
     fn cost(&self) -> f64 {
         self.cost
     }
