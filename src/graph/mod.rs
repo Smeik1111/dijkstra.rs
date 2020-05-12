@@ -78,7 +78,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         self.nodes[to].incoming.push(new_edge_id);
         new_edge_id
     }
-    pub fn search(&self, source: NodeId, target: NodeId) -> Option<Vec<EdgeId>> {
+    pub fn cheapest_path(&self, source: NodeId, target: NodeId) -> Option<Vec<EdgeId>> {
         if source == target {
             return Some(Vec::new());
         }

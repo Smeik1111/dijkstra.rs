@@ -13,7 +13,7 @@ fn main() -> Result<(), serde_json::error::Error> {
     println!("{:?}", sample.state(25));
     println!("{:?}", sample.edge(94));
     println!("{:?}", sample.props(94));
-    if let Some(path) = sample.search(0, 25) {
+    if let Some(path) = sample.cheapest_path(0, 25) {
         println!("{:?}", path);
     }
     Ok(())
