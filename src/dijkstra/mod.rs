@@ -88,7 +88,8 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         if targets.contains(&source) {
             return Some(Vec::new());
         }
-        let mut best_incoming: Vec<Option<Incoming>> = vec![None; self.nodes.len()];
+        // from the source use breadth-first search to find the cheapest incoming edge for each node
+        let mut cheapest_incoming: Vec<Option<Incoming>> = vec![None; self.nodes.len()];
         let mut is_closed: Vec<bool> = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::new();
         let source_cost = 0.0;
@@ -99,25 +100,27 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
             for &edge_id in self.nodes[from].outgoing.iter() {
                 let to = self.edges[edge_id].to;
                 if is_closed[to] {
+                    // since we're using priority queue, every other incoming edge is going to be more expensive
                     continue;
                 }
                 let to_cost = from_cost + self.props[edge_id].cost();
                 let incoming = Incoming(edge_id, to_cost);
-                if best_incoming[to].is_none() || incoming < best_incoming[to].unwrap() {
-                    best_incoming[to] = Some(incoming);
+                if cheapest_incoming[to].is_none() || incoming < cheapest_incoming[to].unwrap() {
+                    cheapest_incoming[to] = Some(incoming);
                     queue.insert(to, to_cost);
                 }
             }
         }
+        // then find the cheapest path walking back from the cheapest target via the cheapest incoming edges
         let cheapest_target: Option<NodeId> = targets
             .iter()
             .cloned()
-            .filter(|&target| best_incoming[target].is_some())
-            .min_by_key(|&target| best_incoming[target].unwrap());
+            .filter(|&target| cheapest_incoming[target].is_some())
+            .min_by_key(|&target| cheapest_incoming[target].unwrap());
         let mut node_id = cheapest_target?;
         let mut path = Vec::new();
         while node_id != source {
-            if let Some(Incoming(edge_id, _)) = best_incoming[node_id] {
+            if let Some(Incoming(edge_id, _)) = cheapest_incoming[node_id] {
                 path.push(edge_id);
                 node_id = self.edges[edge_id].from;
             } else {
@@ -133,6 +136,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
 struct Incoming(EdgeId, CostType);
 impl PartialOrd for Incoming {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        // compare cost
         self.1.partial_cmp(&other.1)
     }
 }
@@ -140,6 +144,7 @@ impl Eq for Incoming {}
 impl Ord for Incoming {
     fn cmp(&self, other: &Self) -> Ordering {
         match self.partial_cmp(&other) {
+            // only interested in Less, since the action is taken if the new cost is less than existing cost
             Some(Ordering::Less) => Ordering::Less,
             _ => Ordering::Greater,
         }
