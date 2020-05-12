@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
+use std::cmp::{Ord, Ordering, PartialOrd};
 use std::fmt::Debug;
-use std::cmp::{Ord, PartialOrd, Ordering};
 
 mod priority_queue;
 
@@ -57,7 +57,10 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         &self.props[id]
     }
     pub fn cost(&self, path: &[EdgeId]) -> CostType {
-        path.iter().cloned().map(|edge_id| self.props[edge_id].cost()).sum()
+        path.iter()
+            .cloned()
+            .map(|edge_id| self.props[edge_id].cost())
+            .sum()
     }
     pub fn insert_node(&mut self, state: NodeState) -> NodeId {
         let new_node_id = self.nodes.len();
@@ -82,7 +85,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         new_edge_id
     }
     pub fn cheapest_path(&self, source: NodeId, targets: &[NodeId]) -> Option<Vec<EdgeId>> {
-        if targets.contains(&source){
+        if targets.contains(&source) {
             return Some(Vec::new());
         }
         let mut best_incoming: Vec<Option<Incoming>> = vec![None; self.nodes.len()];
@@ -106,7 +109,9 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                 }
             }
         }
-        let cheapest_target: Option<NodeId> = targets.iter().cloned()
+        let cheapest_target: Option<NodeId> = targets
+            .iter()
+            .cloned()
             .filter(|&target| best_incoming[target].is_some())
             .min_by_key(|&target| best_incoming[target].unwrap());
         let mut node_id = cheapest_target?;
