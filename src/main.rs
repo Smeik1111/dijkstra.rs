@@ -11,8 +11,8 @@ fn main() -> Result<(), serde_json::error::Error> {
     let sample: Graph<State, Props> = serde_json::from_reader(std::io::stdin())?;
     println!("{:?}", sample.node(25));
     println!("{:?}", sample.state(25));
-    println!("{:?}", sample.edge(99));
-    println!("{:?}", sample.props(99));
+    println!("{:?}", sample.edge(94));
+    println!("{:?}", sample.props(94));
     if let Some(path) = sample.search(0, 25) {
         println!("{:?}", path);
     }
