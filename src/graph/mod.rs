@@ -26,12 +26,13 @@ pub struct Edge {
     pub to: NodeId,
 }
 
+pub trait Cost {
+    fn cost(&self) -> CostType;
+}
+
 type NodeId = usize;
 type EdgeId = usize;
-
-pub trait Cost {
-    fn cost(&self) -> f64;
-}
+type CostType = f64;
 
 impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
     pub fn new() -> Self {
@@ -119,4 +120,4 @@ impl<State: Debug, Props: Debug + Cost> Graph<State, Props> {
 }
 
 #[derive(Debug, Clone)]
-struct BestIncoming(usize, f64);
+struct BestIncoming(EdgeId, CostType);
