@@ -6,9 +6,12 @@ pub struct Heap {
 
 #[derive(Debug, Clone)]
 struct Item {
-    id: usize,
-    cost: f64,
+    id: Id,
+    cost: Cost,
 }
+
+type Id = usize;
+type Cost = f64;
 
 impl Heap {
     pub fn new() -> Self {
@@ -17,11 +20,11 @@ impl Heap {
     pub fn is_empty(&self) -> bool {
         self.items.is_empty()
     }
-    pub fn insert(&mut self, id: usize, cost: f64) {
+    pub fn insert(&mut self, id: Id, cost: Cost) {
         self.items.push(Item { id, cost });
         self.promote(self.items.len() - 1);
     }
-    pub fn extract_min(&mut self) -> Option<(usize, f64)> {
+    pub fn extract_min(&mut self) -> Option<(Id, Cost)> {
         match self.items.len() {
             0 => None,
             1 => {
@@ -37,7 +40,7 @@ impl Heap {
         }
     }
     // demote more expensive parent towards the bottom of the heap
-    fn demote(&mut self, mut parent: usize) {
+    fn demote(&mut self, mut parent: Id) {
         loop {
             match self.children(parent) {
                 (Some(left), Some(right))
@@ -58,7 +61,7 @@ impl Heap {
         }
     }
     // promote less expensive child towards the top of the heap
-    fn promote(&mut self, mut child: usize) {
+    fn promote(&mut self, mut child: Id) {
         loop {
             match self.parent(child) {
                 Some(parent) if self.items[child].cost < self.items[parent].cost => {
@@ -71,14 +74,14 @@ impl Heap {
             }
         }
     }
-    fn parent(&self, child: usize) -> Option<usize> {
+    fn parent(&self, child: Id) -> Option<Id> {
         if child == 0 {
             None
         } else {
             Some((child - 1) / 2)
         }
     }
-    fn children(&self, parent: usize) -> (Option<usize>, Option<usize>) {
+    fn children(&self, parent: Id) -> (Option<Id>, Option<Id>) {
         let left = 2 * parent + 1;
         let right = left + 1;
         if left < self.items.len() {
