@@ -84,12 +84,10 @@ impl Heap {
     fn children(&self, parent: Id) -> (Option<Id>, Option<Id>) {
         let left = 2 * parent + 1;
         let right = left + 1;
-        if left < self.items.len() {
-            if right < self.items.len() {
-                (Some(left), Some(right))
-            } else {
-                (Some(left), None)
-            }
+        if right < self.items.len() {
+            (Some(left), Some(right))
+        } else if left < self.items.len() {
+            (Some(left), None)
         } else {
             (None, None)
         }
