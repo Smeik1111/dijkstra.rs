@@ -105,7 +105,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         if best_incoming[target].is_none() {
             return None;
         }
-        let mut path: Vec<EdgeId> = Vec::new();
+        let mut path = Vec::new();
         let mut from = target;
         while from != source {
             if let Some(BestIncoming(edge_id, _)) = best_incoming[from] {
