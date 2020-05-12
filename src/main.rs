@@ -1,6 +1,6 @@
-mod graph;
+mod dijkstra;
 
-use graph::Graph;
+use dijkstra::Graph;
 use serde::{Deserialize, Serialize};
 
 fn main() -> Result<(), serde_json::error::Error> {
@@ -8,12 +8,12 @@ fn main() -> Result<(), serde_json::error::Error> {
     // let json = serde_json::to_string(&sample)?;
     // println!("{}", json);
 
-    let sample: Graph<State, Props> = serde_json::from_reader(std::io::stdin())?;
-    println!("{:?}", sample.node(25));
-    println!("{:?}", sample.state(25));
-    println!("{:?}", sample.edge(94));
-    println!("{:?}", sample.props(94));
-    if let Some(path) = sample.cheapest_path(0, 25) {
+    let graph: Graph<State, Props> = serde_json::from_reader(std::io::stdin())?;
+    println!("{:?}", graph.node(25));
+    println!("{:?}", graph.state(25));
+    println!("{:?}", graph.edge(94));
+    println!("{:?}", graph.props(94));
+    if let Some(path) = graph.cheapest_path(0, 25) {
         println!("{:?}", path);
     }
     Ok(())
@@ -45,7 +45,7 @@ pub struct Props {
     cost: f64,
 }
 
-impl graph::Cost for Props {
+impl dijkstra::Cost for Props {
     fn cost(&self) -> f64 {
         self.cost
     }
