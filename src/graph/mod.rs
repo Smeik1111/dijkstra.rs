@@ -106,11 +106,11 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
             return None;
         }
         let mut path = Vec::new();
-        let mut from = target;
-        while from != source {
-            if let Some(BestIncoming(edge_id, _)) = best_incoming[from] {
+        let mut node_id = target;
+        while node_id != source {
+            if let Some(BestIncoming(edge_id, _)) = best_incoming[node_id] {
                 path.push(edge_id);
-                from = self.edges[edge_id].from;
+                node_id = self.edges[edge_id].from;
             } else {
                 unreachable!();
             }
