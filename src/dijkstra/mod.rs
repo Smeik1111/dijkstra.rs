@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::cmp::{Ord, Ordering, PartialOrd};
 use std::fmt::Debug;
 use std::iter::Sum;
 use std::ops::Add;
@@ -31,7 +30,7 @@ pub struct Edge {
 }
 
 pub trait Cost {
-    type Type: Debug + Copy + PartialOrd + PartialEq + Add<Output = Self::Type> + Sum;
+    type Type: Debug + Copy + PartialOrd + PartialEq + Ord + Add<Output = Self::Type> + Sum;
     fn cost(&self) -> Self::Type;
     fn zero_cost() -> Self::Type;
 }
@@ -94,6 +93,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         }
         // from the source, use breadth-first search to find the cheapest incoming edge for each node
         let mut cheapest_incoming = vec![None; self.nodes.len()];
+        let mut cost = vec![None; self.nodes.len()];
         let mut is_closed = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::<<EdgeProps as Cost>::Type>::new();
         let source_cost = EdgeProps::zero_cost();
@@ -108,9 +108,9 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                     continue;
                 }
                 let to_cost = from_cost + self.props[edge_id].cost();
-                let incoming = Incoming::<<EdgeProps as Cost>::Type>(edge_id, to_cost);
-                if cheapest_incoming[to].is_none() || incoming < cheapest_incoming[to].unwrap() {
-                    cheapest_incoming[to] = Some(incoming);
+                if cost[to].is_none() || to_cost < cost[to].unwrap() {
+                    cost[to] = Some(to_cost);
+                    cheapest_incoming[to] = Some(edge_id);
                     queue.insert(to, to_cost);
                     // the queue might still have the old more expensive items for 'to',
                     // but they will be discarded when they eventually get to the front of the queue
@@ -121,12 +121,12 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         let cheapest_target: Option<NodeId> = targets
             .iter()
             .cloned()
-            .filter(|&target| cheapest_incoming[target].is_some())
-            .min_by_key(|&target| cheapest_incoming[target].unwrap());
+            .filter(|&target| cost[target].is_some())
+            .min_by_key(|&target| cost[target].unwrap());
         let mut node_id = cheapest_target?;
         let mut path = Vec::new();
         while node_id != source {
-            if let Some(Incoming(edge_id, _)) = cheapest_incoming[node_id] {
+            if let Some(edge_id) = cheapest_incoming[node_id] {
                 path.push(edge_id);
                 node_id = self.edges[edge_id].from;
             } else {
@@ -135,28 +135,5 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         }
         path.reverse();
         Some(path)
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-struct Incoming<CostType>(EdgeId, CostType);
-
-// PartialOrd is needed to be able to compare Incoming values in breadth-first search
-impl<CostType: PartialOrd> PartialOrd for Incoming<CostType> {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        // compare cost
-        self.1.partial_cmp(&other.1)
-    }
-}
-
-// Ord is needed to be able to use Incoming values in min_by_key
-impl<CostType: PartialEq> Eq for Incoming<CostType> {}
-impl<CostType: PartialOrd> Ord for Incoming<CostType> {
-    fn cmp(&self, other: &Self) -> Ordering {
-        match self.partial_cmp(&other) {
-            // only interested in Less, since the action is taken if the new cost is less than existing cost
-            Some(Ordering::Less) => Ordering::Less,
-            _ => Ordering::Greater,
-        }
     }
 }

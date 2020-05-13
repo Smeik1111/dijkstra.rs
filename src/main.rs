@@ -1,3 +1,8 @@
+use std::cmp::{Eq, Ord, Ordering, PartialOrd};
+use std::fmt::Debug;
+use std::iter::Sum;
+use std::ops::Add;
+
 mod dijkstra;
 
 use dijkstra::Graph;
@@ -31,7 +36,7 @@ pub fn random_sample() -> Graph<State, Props> {
         let from = (rand::random::<u8>() / 10) as usize;
         let to = (rand::random::<u8>() / 10) as usize;
         let cost = rand::random::<f64>();
-        graph.insert_edge(from, to, Props { cost });
+        graph.insert_edge(from, to, Props { cost: Cost(cost) });
     }
     graph
 }
@@ -43,15 +48,40 @@ pub struct State {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Props {
-    cost: f64,
+    cost: Cost,
 }
 
 impl dijkstra::Cost for Props {
-    type Type = f64;
+    type Type = Cost;
     fn cost(&self) -> Self::Type {
         self.cost
     }
     fn zero_cost() -> Self::Type {
-        0.0
+        Cost(0.0)
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
+pub struct Cost(f64);
+
+impl Eq for Cost {}
+impl Ord for Cost {
+    fn cmp(&self, other: &Cost) -> Ordering {
+        // panic if any of the values are NaN
+        self.partial_cmp(other).unwrap()
+    }
+}
+impl Add for Cost {
+    type Output = Cost;
+    fn add(self, other: Self) -> Self::Output {
+        Self(self.0 + other.0)
+    }
+}
+
+impl Sum for Cost {
+    fn sum<I>(iter: I) -> Self
+        where I: Iterator<Item = Cost>
+    {
+        Cost(iter.map(|cost| cost.0).sum())
     }
 }
