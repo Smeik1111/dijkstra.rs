@@ -51,7 +51,7 @@ impl dijkstra::Cost for Props {
     fn cost(&self) -> Self::Type {
         self.cost
     }
-    fn zero() -> Self::Type {
+    fn zero_cost() -> Self::Type {
         0.0
     }
 }

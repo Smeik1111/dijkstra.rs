@@ -33,7 +33,7 @@ pub struct Edge {
 pub trait Cost {
     type Type: Debug + Copy + PartialOrd + PartialEq + Add<Output = Self::Type> + Sum;
     fn cost(&self) -> Self::Type;
-    fn zero() -> Self::Type;
+    fn zero_cost() -> Self::Type;
 }
 
 type NodeId = usize;
@@ -96,7 +96,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         let mut cheapest_incoming = vec![None; self.nodes.len()];
         let mut is_closed = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::<<EdgeProps as Cost>::Type>::new();
-        let source_cost = EdgeProps::zero();
+        let source_cost = EdgeProps::zero_cost();
         queue.insert(source, source_cost);
         while !queue.is_empty() {
             let (from, from_cost) = queue.extract_min().unwrap();
