@@ -1,19 +1,18 @@
 // priority queue based on binary heap for efficient access to id with the lowest cost
 #[derive(Debug)]
-pub struct Heap {
-    items: Vec<Item>,
+pub struct Heap<Cost> {
+    items: Vec<Item<Cost>>,
 }
 
 #[derive(Debug, Clone)]
-struct Item {
+struct Item<Cost> {
     id: Id,
     cost: Cost,
 }
 
 type Id = usize;
-type Cost = f64;
 
-impl Heap {
+impl<Cost: Clone + PartialOrd> Heap<Cost> {
     pub fn new() -> Self {
         Heap { items: Vec::new() }
     }
@@ -100,7 +99,7 @@ mod tests {
 
     #[test]
     fn test() {
-        let mut heap = Heap::new();
+        let mut heap: Heap<f64> = Heap::new();
         heap.insert(1, 0.3);
         heap.insert(2, 0.5);
         heap.insert(3, 0.7);

@@ -15,7 +15,7 @@ fn main() -> Result<(), serde_json::error::Error> {
     println!("{:?}", graph.props(94));
     if let Some(path) = graph.cheapest_path(0, &[23, 24, 25]) {
         println!("{:?}", path);
-        println!("{}", graph.cost(&path));
+        //println!("{}", graph.cost(&path));
     }
     Ok(())
 }
@@ -46,8 +46,12 @@ pub struct Props {
     cost: f64,
 }
 
-impl dijkstra::EdgeCost for Props {
-    fn cost(&self) -> f64 {
+impl dijkstra::Cost for Props {
+    type Type = f64;
+    fn cost(&self) -> Self::Type {
         self.cost
+    }
+    fn zero() -> Self::Type {
+        0.0
     }
 }
