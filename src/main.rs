@@ -80,7 +80,8 @@ impl Add for Cost {
 
 impl Sum for Cost {
     fn sum<I>(iter: I) -> Self
-        where I: Iterator<Item = Cost>
+    where
+        I: Iterator<Item = Cost>,
     {
         Cost(iter.map(|cost| cost.0).sum())
     }
