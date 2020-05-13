@@ -4,7 +4,8 @@ use std::ops::Add;
 use std::fmt;
 use serde::{Deserialize, Serialize};
 
-// a wrapper around an integer or float type
+// a wrapper around an integer or float type;
+// floats cannot be used directly as they do not implement Ord
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
 pub struct Cost<T>(pub T);
 

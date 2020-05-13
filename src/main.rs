@@ -4,6 +4,9 @@ mod types;
 use dijkstra::Graph;
 use serde::{Deserialize, Serialize};
 
+type CostType = f64;
+const ZERO_COST: CostType = 0.0;
+
 fn main() -> Result<(), serde_json::error::Error> {
     // let sample = random_sample();
     // let json = serde_json::to_string(&sample)?;
@@ -31,7 +34,7 @@ pub fn random_sample() -> Graph<State, Props> {
     for _ in 0..100 {
         let from = (rand::random::<u8>() / 10) as usize;
         let to = (rand::random::<u8>() / 10) as usize;
-        let cost = rand::random::<f64>();
+        let cost = rand::random::<CostType>();
         graph.insert_edge(from, to, Props { cost: types::Cost(cost) });
     }
     graph
@@ -44,15 +47,15 @@ pub struct State {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Props {
-    cost: types::Cost<f64>,
+    cost: types::Cost<CostType>,
 }
 
 impl dijkstra::Cost for Props {
-    type Type = types::Cost<f64>;
+    type Type = types::Cost<CostType>;
     fn cost(&self) -> Self::Type {
         self.cost
     }
     fn zero_cost() -> Self::Type {
-        types::Cost(0.0)
+        types::Cost(ZERO_COST)
     }
 }
