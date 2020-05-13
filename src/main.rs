@@ -17,7 +17,7 @@ fn main() -> Result<(), serde_json::error::Error> {
     println!("{:?}", graph.state(25));
     println!("{:?}", graph.edge(94));
     println!("{:?}", graph.props(94));
-    if let Some(path) = graph.cheapest_path(0, &[23, 24, 25]) {
+    if let Some(path) = graph.best_path(0, &[23, 24, 25]) {
         println!("{:?}", path);
         println!("{}", graph.cost(&path));
     }

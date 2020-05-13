@@ -87,30 +87,31 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         self.nodes[to].incoming.push(new_edge_id);
         new_edge_id
     }
-    pub fn cheapest_path(&self, source: NodeId, targets: &[NodeId]) -> Option<Vec<EdgeId>> {
+    // find the cheapest path to any of the targets
+    pub fn best_path(&self, source: NodeId, targets: &[NodeId]) -> Option<Vec<EdgeId>> {
         if targets.contains(&source) {
             return Some(Vec::new());
         }
         // from the source, use breadth-first search to find the cheapest incoming edge for each node
-        let mut cheapest_incoming = vec![None; self.nodes.len()];
-        let mut cost = vec![None; self.nodes.len()];
+        let mut best_incoming = vec![None; self.nodes.len()];
+        let mut best_cost = vec![None; self.nodes.len()];
         let mut is_closed = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::<<EdgeProps as Cost>::Type>::new();
-        let source_cost = EdgeProps::zero_cost();
-        queue.insert(source, source_cost);
+        queue.insert(source, EdgeProps::zero_cost());
         while !queue.is_empty() {
             let (from, from_cost) = queue.extract_min().unwrap();
             is_closed[from] = true;
             for &edge_id in self.nodes[from].outgoing.iter() {
                 let to = self.edges[edge_id].to;
-                if is_closed[to] {
-                    // since we're using priority queue, every other incoming edge is going to be more expensive
+                if to == from || is_closed[to] {
+                    // skip loopy edges (they just increase cost) or edges that end at a closed node,
+                    // since we're using priority queue and thus a closed node already has the best cost and incoming
                     continue;
                 }
                 let to_cost = from_cost + self.props[edge_id].cost();
-                if cost[to].is_none() || to_cost < cost[to].unwrap() {
-                    cost[to] = Some(to_cost);
-                    cheapest_incoming[to] = Some(edge_id);
+                if best_cost[to].is_none() || to_cost < best_cost[to].unwrap() {
+                    best_cost[to] = Some(to_cost);
+                    best_incoming[to] = Some(edge_id);
                     queue.insert(to, to_cost);
                     // the queue might still have the old more expensive items for 'to',
                     // but they will be discarded when they eventually get to the front of the queue
@@ -121,12 +122,12 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         let cheapest_target: Option<NodeId> = targets
             .iter()
             .cloned()
-            .filter(|&target| cost[target].is_some())
-            .min_by_key(|&target| cost[target].unwrap());
+            .filter(|&target| best_cost[target].is_some())
+            .min_by_key(|&target| best_cost[target].unwrap());
         let mut node_id = cheapest_target?;
         let mut path = Vec::new();
         while node_id != source {
-            if let Some(edge_id) = cheapest_incoming[node_id] {
+            if let Some(edge_id) = best_incoming[node_id] {
                 path.push(edge_id);
                 node_id = self.edges[edge_id].from;
             } else {
