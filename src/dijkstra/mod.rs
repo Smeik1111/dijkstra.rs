@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 use std::cmp::{Ord, Ordering, PartialOrd};
-use std::ops::Add;
-use std::iter::Sum;
 use std::fmt::Debug;
+use std::iter::Sum;
+use std::ops::Add;
 
 mod priority_queue;
 
@@ -31,7 +31,7 @@ pub struct Edge {
 }
 
 pub trait Cost {
-    type Type: Debug + Copy + PartialOrd + PartialEq + Add<Output=Self::Type> + Sum;
+    type Type: Debug + Copy + PartialOrd + PartialEq + Add<Output = Self::Type> + Sum;
     fn cost(&self) -> Self::Type;
     fn zero() -> Self::Type;
 }
