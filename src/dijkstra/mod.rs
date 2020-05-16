@@ -10,8 +10,8 @@ mod priority_queue;
 #[derive(Debug, Default, Deserialize, Serialize)]
 pub struct Graph<NodeState: Debug, EdgeProps: Debug> {
     nodes: Vec<Node>,
-    states: Vec<NodeState>,
     edges: Vec<Edge>,
+    states: Vec<NodeState>,
     props: Vec<EdgeProps>,
 }
 
