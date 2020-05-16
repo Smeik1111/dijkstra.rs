@@ -174,17 +174,18 @@ mod tests {
         graph.insert_edge(source, a, Props { cost: 1 });
         graph.insert_edge(source, b, Props { cost: 2 });
         graph.insert_edge(a, target, Props { cost: 10 });
-        graph.insert_edge(b, target, Props { cost: 5 });
+        graph.insert_edge(b, target, Props { cost: 8 });
+        graph.insert_edge(b, a, Props { cost: 3 });
 
         let path = graph.best_path(source, &[target]);
         assert!(path.is_some());
         let path = path.unwrap();
         assert_eq!(path.len(), 2);
-        // source-b-target is the best path with cost 7 (source-a-target has cost 11)
+        // source-b-target is the best path with cost 10
         assert_eq!(graph.edge(path[0]).from, source);
         assert_eq!(graph.edge(path[0]).to, b);
         assert_eq!(graph.edge(path[1]).from, b);
         assert_eq!(graph.edge(path[1]).to, target);
-        assert_eq!(graph.cost(&path), 7);
+        assert_eq!(graph.cost(&path), 10);
     }
 }
