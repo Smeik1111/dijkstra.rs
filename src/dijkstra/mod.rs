@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
 use std::iter::Sum;
 use std::ops::Add;
+use std::collections::HashMap;
 
 mod priority_queue;
 
@@ -145,7 +146,7 @@ mod tests {
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
     struct State {
-        name: String,
+        name: char,
     }
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -162,30 +163,37 @@ mod tests {
             0u8
         }
     }
-    
+
+    fn graph_from_edges(edges: &[(char, char, u8)]) -> (Graph<State, Props>, impl Fn(char) -> usize) {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let mut id = HashMap::new();
+        for &(from_name, to_name, cost) in edges.iter() {
+            id.entry(from_name).or_insert(graph.insert_node(State { name: from_name }));
+            id.entry(to_name).or_insert(graph.insert_node(State { name: to_name }));
+            graph.insert_edge(*id.get(&from_name).unwrap(), *id.get(&to_name).unwrap(), Props { cost });
+        }
+        (graph, move |name| *id.get(&name).unwrap())
+    }
+
     #[test]
     fn test() {
-        let mut graph: Graph<State, Props> = Graph::new();
-        let source = graph.insert_node(State { name: "source".to_owned() });
-        let a = graph.insert_node(State { name: "a".to_owned() });
-        let b = graph.insert_node(State { name: "b".to_owned() });
-        let target = graph.insert_node(State { name: "target".to_owned() });
+        let (graph, node_id) = graph_from_edges(&[
+            ('a', 'b', 1),
+            ('b', 'd', 10),
+            ('a', 'c', 2),
+            ('c', 'b', 3),
+            ('c', 'd', 8),
+            ]);
+        let from = |edge_id| graph.state(graph.edge(edge_id).from).name;
+        let to   = |edge_id| graph.state(graph.edge(edge_id).to).name;
 
-        graph.insert_edge(source, a, Props { cost: 1 });
-        graph.insert_edge(source, b, Props { cost: 2 });
-        graph.insert_edge(a, target, Props { cost: 10 });
-        graph.insert_edge(b, target, Props { cost: 8 });
-        graph.insert_edge(b, a, Props { cost: 3 });
-
-        let path = graph.best_path(source, &[target]);
-        assert!(path.is_some());
-        let path = path.unwrap();
+        assert_eq!(node_id('a'), 0);
+        let path = graph.best_path(node_id('a'), &[node_id('d')]).unwrap();
         assert_eq!(path.len(), 2);
-        // source-b-target is the best path with cost 10
-        assert_eq!(graph.edge(path[0]).from, source);
-        assert_eq!(graph.edge(path[0]).to, b);
-        assert_eq!(graph.edge(path[1]).from, b);
-        assert_eq!(graph.edge(path[1]).to, target);
+        assert_eq!(from(path[0]), 'a');
+        assert_eq!(to(path[0]), 'c');
+        assert_eq!(from(path[1]), 'c');
+        assert_eq!(to(path[1]), 'd');
         assert_eq!(graph.cost(&path), 10);
     }
 }
