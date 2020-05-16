@@ -145,7 +145,7 @@ mod tests {
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
     struct State {
-        name: String,
+        name: char,
     }
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -159,33 +159,61 @@ mod tests {
             self.cost
         }
         fn zero_cost() -> Self::Type {
-            0u8
+            0
         }
     }
     
     #[test]
-    fn test() {
+    fn node_state() {
         let mut graph: Graph<State, Props> = Graph::new();
-        let source = graph.insert_node(State { name: "source".to_string() });
-        let a = graph.insert_node(State { name: "a".to_string() });
-        let b = graph.insert_node(State { name: "b".to_string() });
-        let target = graph.insert_node(State { name: "target".to_string() });
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+        let c = graph.insert_node(State { name: 'c' });
 
-        graph.insert_edge(source, a, Props { cost: 1 });
-        graph.insert_edge(source, b, Props { cost: 2 });
-        graph.insert_edge(a, target, Props { cost: 11 });
-        graph.insert_edge(b, target, Props { cost: 8 });
-        graph.insert_edge(b, a, Props { cost: 3 });
+        assert_eq!(graph.state(a).name, 'a');
+        assert_eq!(graph.state(b).name, 'b');
+        assert_eq!(graph.state(c).name, 'c');
+    }
 
-        let path = graph.best_path(source, &[target]);
-        assert!(path.is_some());
-        let path = path.unwrap();
+    #[test]
+    fn edge_props() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+        let c = graph.insert_node(State { name: 'c' });
+
+        let ab = graph.insert_edge(a, b, Props { cost: 1 });
+        let bc = graph.insert_edge(b, c, Props { cost: 2 });
+
+        assert_eq!(graph.props(ab).cost, 1);
+        assert_eq!(graph.props(bc).cost, 2);
+        assert_eq!(graph.edge(ab).from, a);
+        assert_eq!(graph.edge(bc).from, b);
+        assert_eq!(graph.edge(ab).to, b);
+        assert_eq!(graph.edge(bc).to, c);
+    }
+
+    #[test]
+    fn best_path() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+        let c = graph.insert_node(State { name: 'c' });
+        let d = graph.insert_node(State { name: 'd' });
+
+        graph.insert_edge(a, b, Props { cost: 1 });
+        graph.insert_edge(b, d, Props { cost: 11 });
+        graph.insert_edge(a, c, Props { cost: 2 });
+        graph.insert_edge(c, d, Props { cost: 5 });
+        graph.insert_edge(c, b, Props { cost: 3 });
+
+        let path = graph.best_path(a, &[d]).unwrap();
+
         assert_eq!(path.len(), 2);
-        // source-b-target is the best path with cost 10
-        assert_eq!(graph.edge(path[0]).from, source);
-        assert_eq!(graph.edge(path[0]).to, b);
-        assert_eq!(graph.edge(path[1]).from, b);
-        assert_eq!(graph.edge(path[1]).to, target);
-        assert_eq!(graph.cost(&path), 10);
+        assert_eq!(graph.edge(path[0]).from, a);
+        assert_eq!(graph.edge(path[0]).to,   c);
+        assert_eq!(graph.edge(path[1]).from, c);
+        assert_eq!(graph.edge(path[1]).to,   d);
+        assert_eq!(graph.cost(&path), 7);
     }
 }
