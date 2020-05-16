@@ -162,7 +162,7 @@ mod tests {
             0
         }
     }
-    
+
     #[test]
     fn node_state() {
         let mut graph: Graph<State, Props> = Graph::new();
@@ -211,9 +211,9 @@ mod tests {
 
         assert_eq!(path.len(), 2);
         assert_eq!(graph.edge(path[0]).from, a);
-        assert_eq!(graph.edge(path[0]).to,   c);
+        assert_eq!(graph.edge(path[0]).to, c);
         assert_eq!(graph.edge(path[1]).from, c);
-        assert_eq!(graph.edge(path[1]).to,   d);
+        assert_eq!(graph.edge(path[1]).to, d);
         assert_eq!(graph.cost(&path), 7);
     }
 }
