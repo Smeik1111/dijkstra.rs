@@ -138,3 +138,53 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         Some(path)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+    struct State {
+        name: String,
+    }
+
+    #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+    struct Props {
+        cost: u8,
+    }
+
+    impl Cost for Props {
+        type Type = u8;
+        fn cost(&self) -> Self::Type {
+            self.cost
+        }
+        fn zero_cost() -> Self::Type {
+            0u8
+        }
+    }
+    
+    #[test]
+    fn test() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let source = graph.insert_node(State { name: "source".to_owned() });
+        let a = graph.insert_node(State { name: "a".to_owned() });
+        let b = graph.insert_node(State { name: "b".to_owned() });
+        let target = graph.insert_node(State { name: "target".to_owned() });
+
+        graph.insert_edge(source, a, Props { cost: 1 });
+        graph.insert_edge(source, b, Props { cost: 2 });
+        graph.insert_edge(a, target, Props { cost: 10 });
+        graph.insert_edge(b, target, Props { cost: 5 });
+
+        let path = graph.best_path(source, &[target]);
+        assert!(path.is_some());
+        let path = path.unwrap();
+        assert_eq!(path.len(), 2);
+        // source-b-target is the best path with cost 7 (source-a-target has cost 11)
+        assert_eq!(graph.edge(path[0]).from, source);
+        assert_eq!(graph.edge(path[0]).to, b);
+        assert_eq!(graph.edge(path[1]).from, b);
+        assert_eq!(graph.edge(path[1]).to, target);
+        assert_eq!(graph.cost(&path), 7);
+    }
+}
