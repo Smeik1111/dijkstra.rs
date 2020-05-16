@@ -166,14 +166,14 @@ mod tests {
     #[test]
     fn test() {
         let mut graph: Graph<State, Props> = Graph::new();
-        let source = graph.insert_node(State { name: "source".to_owned() });
-        let a = graph.insert_node(State { name: "a".to_owned() });
-        let b = graph.insert_node(State { name: "b".to_owned() });
-        let target = graph.insert_node(State { name: "target".to_owned() });
+        let source = graph.insert_node(State { name: "source".to_string() });
+        let a = graph.insert_node(State { name: "a".to_string() });
+        let b = graph.insert_node(State { name: "b".to_string() });
+        let target = graph.insert_node(State { name: "target".to_string() });
 
         graph.insert_edge(source, a, Props { cost: 1 });
         graph.insert_edge(source, b, Props { cost: 2 });
-        graph.insert_edge(a, target, Props { cost: 10 });
+        graph.insert_edge(a, target, Props { cost: 11 });
         graph.insert_edge(b, target, Props { cost: 8 });
         graph.insert_edge(b, a, Props { cost: 3 });
 
