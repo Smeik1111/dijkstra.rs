@@ -42,8 +42,8 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
-            states: Vec::new(),
             edges: Vec::new(),
+            states: Vec::new(),
             props: Vec::new(),
         }
     }
