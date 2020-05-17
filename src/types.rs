@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::cmp::Ordering;
 use std::fmt;
 use std::iter::Sum;
-use std::ops::Add;
+use std::ops::{Add, Sub};
 
 // a wrapper for float types; floats cannot be used directly as they do not implement Ord
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Serialize, Deserialize)]
@@ -15,10 +15,18 @@ impl<T: PartialOrd> Ord for Float<T> {
         self.partial_cmp(other).unwrap()
     }
 }
+
 impl<T: Add<Output = T>> Add for Float<T> {
     type Output = Float<T>;
     fn add(self, other: Self) -> Self::Output {
         Self(self.0 + other.0)
+    }
+}
+
+impl<T: Sub<Output = T>> Sub for Float<T> {
+    type Output = Float<T>;
+    fn sub(self, other: Self) -> Self::Output {
+        Self(self.0 - other.0)
     }
 }
 

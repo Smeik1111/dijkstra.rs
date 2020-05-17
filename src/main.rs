@@ -1,7 +1,8 @@
-mod dijkstra;
+mod graph;
 mod types;
+mod priority_queue;
 
-use dijkstra::Graph;
+use graph::Graph;
 use serde::{Deserialize, Serialize};
 use types::Float;
 
@@ -50,7 +51,7 @@ pub struct Props {
     cost: Float<Cost>,
 }
 
-impl dijkstra::Cost for Props {
+impl graph::Cost for Props {
     type Type = Float<Cost>;
     fn cost(&self) -> Self::Type {
         self.cost

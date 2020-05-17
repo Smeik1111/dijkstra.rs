@@ -3,7 +3,7 @@ use std::fmt::Debug;
 use std::iter::Sum;
 use std::ops::Add;
 
-mod priority_queue;
+use crate::priority_queue;
 
 // data-oriented graph with user-defined node states and edge props;
 // nodes and edges can be inserted but not deleted
@@ -142,6 +142,13 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::types::Float;
+
+    macro_rules! assert_almost_eq {
+        ($left:expr, $right:expr) => {
+            assert!(($left - $right).0.abs() < f64::EPSILON )
+        }
+    }
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
     struct State {
@@ -150,16 +157,16 @@ mod tests {
 
     #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
     struct Props {
-        cost: u8,
+        cost: Float<f64>,
     }
 
     impl Cost for Props {
-        type Type = u8;
+        type Type = Float<f64>;
         fn cost(&self) -> Self::Type {
             self.cost
         }
         fn zero_cost() -> Self::Type {
-            0
+            Float(0.0)
         }
     }
 
@@ -171,10 +178,10 @@ mod tests {
         let c = graph.insert_node(State { name: 'c' });
         let d = graph.insert_node(State { name: 'd' });
 
-        let ab = graph.insert_edge(a, b, Props { cost: 1 });
-        let bc = graph.insert_edge(b, c, Props { cost: 1 });
-        let ad = graph.insert_edge(a, d, Props { cost: 1 });
-        let dc = graph.insert_edge(d, c, Props { cost: 1 });
+        let ab = graph.insert_edge(a, b, Props { cost: Float(1.0) });
+        let bc = graph.insert_edge(b, c, Props { cost: Float(1.0) });
+        let ad = graph.insert_edge(a, d, Props { cost: Float(1.0) });
+        let dc = graph.insert_edge(d, c, Props { cost: Float(1.0) });
 
         assert_eq!(graph.node(a).id, a);
         assert!(graph.node(a).incoming.is_empty());
@@ -203,12 +210,12 @@ mod tests {
         let a = graph.insert_node(State { name: 'a' });
         let b = graph.insert_node(State { name: 'b' });
 
-        let ab = graph.insert_edge(a, b, Props { cost: 1 });
+        let ab = graph.insert_edge(a, b, Props { cost: Float(1.0) });
 
         assert_eq!(graph.edge(ab).id, ab);
         assert_eq!(graph.edge(ab).from, a);
         assert_eq!(graph.edge(ab).to, b);
-        assert_eq!(graph.props(ab).cost, 1);
+        assert_eq!(graph.props(ab).cost, Float(1.0));
     }
 
     #[test]
@@ -219,17 +226,17 @@ mod tests {
         let c = graph.insert_node(State { name: 'c' });
         let d = graph.insert_node(State { name: 'd' });
 
-        graph.insert_edge(a, b, Props { cost: 1 });
-        graph.insert_edge(b, d, Props { cost: 11 });
-        let ac = graph.insert_edge(a, c, Props { cost: 2 });
-        let cd = graph.insert_edge(c, d, Props { cost: 5 });
-        graph.insert_edge(c, b, Props { cost: 3 });
+        graph.insert_edge(a, b, Props { cost: Float(0.01) });
+        graph.insert_edge(b, c, Props { cost: Float(0.9) });
+        let ad = graph.insert_edge(a, d, Props { cost: Float(0.1) });
+        let dc = graph.insert_edge(d, c, Props { cost: Float(0.2) });
+        graph.insert_edge(d, b, Props { cost: Float(0.01) });
 
-        // three paths are possible from a to d: ab-bd (cost 12), ac-cd (cost 7), and ac-cb-bd (cost 16)
-        let path = graph.best_path(a, &[d]).unwrap();
+        // three paths are possible from a to c: ab-bc, ad-db-bc, and ad-dc
+        let path = graph.best_path(a, &[c]).unwrap();
 
-        assert_eq!(path, [ac, cd]);
-        assert_eq!(graph.cost(&path), 7);
+        assert_eq!(path, [ad, dc]);
+        assert_almost_eq!(graph.cost(&path), Float(0.3));
     }
 
     #[test]
@@ -239,13 +246,13 @@ mod tests {
         let b = graph.insert_node(State { name: 'b' });
         let c = graph.insert_node(State { name: 'c' });
 
-        graph.insert_edge(a, b, Props { cost: 2 });
-        let ac = graph.insert_edge(a, c, Props { cost: 1 });
+        graph.insert_edge(a, b, Props { cost: Float(2.0) });
+        let ac = graph.insert_edge(a, c, Props { cost: Float(1.0) });
 
         let path = graph.best_path(a, &[b, c]).unwrap();
 
         assert_eq!(path, [ac]);
-        assert_eq!(graph.cost(&path), 1);
+        assert_eq!(graph.cost(&path), Float(1.0));
     }
 
     #[test]
@@ -254,9 +261,9 @@ mod tests {
         let a = graph.insert_node(State { name: 'a' });
         let b = graph.insert_node(State { name: 'b' });
 
-        let u = graph.insert_edge(a, b, Props { cost: 3 });
-        let v = graph.insert_edge(a, b, Props { cost: 2 });
-        let w = graph.insert_edge(a, b, Props { cost: 1 });
+        let u = graph.insert_edge(a, b, Props { cost: Float(3.0) });
+        let v = graph.insert_edge(a, b, Props { cost: Float(2.0) });
+        let w = graph.insert_edge(a, b, Props { cost: Float(1.0) });
 
         assert_ne!(u, v);
         assert_ne!(u, w);
@@ -265,7 +272,7 @@ mod tests {
         let path = graph.best_path(a, &[b]).unwrap();
 
         assert_eq!(path, [w]);
-        assert_eq!(graph.cost(&path), 1);
+        assert_eq!(graph.cost(&path), Float(1.0));
     }
 
     #[test]
@@ -274,14 +281,14 @@ mod tests {
         let a = graph.insert_node(State { name: 'a' });
         let b = graph.insert_node(State { name: 'b' });
 
-        let u = graph.insert_edge(a, a, Props { cost: 1 });
-        let v = graph.insert_edge(a, b, Props { cost: 2 });
+        let u = graph.insert_edge(a, a, Props { cost: Float(1.0) });
+        let v = graph.insert_edge(a, b, Props { cost: Float(2.0) });
 
         assert_ne!(u, v);
 
         let path = graph.best_path(a, &[b]).unwrap();
 
         assert_eq!(path, [v]);
-        assert_eq!(graph.cost(&path), 2);
+        assert_eq!(graph.cost(&path), Float(2.0));
     }
 }
