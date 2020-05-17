@@ -111,12 +111,15 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                 break;
             }
             is_closed[from] = true;
-            for (edge_id, to, to_cost) in self.nodes[from]
+            for (edge_id, edge_cost) in self.nodes[from]
                 .outgoing
                 .iter()
-                .filter(|&&id| self.edges[id].to != from && !is_closed[self.edges[id].to])
-                .map(|&id| (id, self.edges[id].to, from_cost + self.props[id].cost()))
+                .filter(|&&id| self.edges[id].to != from)
+                .filter(|&&id| !is_closed[self.edges[id].to])
+                .map(|&id| (id, self.props[id].cost()))
             {
+                let to = self.edges[edge_id].to;
+                let to_cost = from_cost + edge_cost;
                 if best_cost[to].is_none() || to_cost < best_cost[to].unwrap() {
                     best_cost[to] = Some(to_cost);
                     best_incoming[to] = Some(edge_id);
