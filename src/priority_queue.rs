@@ -1,5 +1,5 @@
 // priority queue based on binary heap for efficient access to id with the lowest cost
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Heap<Cost> {
     items: Vec<Item<Cost>>,
 }
