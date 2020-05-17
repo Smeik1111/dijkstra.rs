@@ -267,4 +267,21 @@ mod tests {
         assert_eq!(path, [w]);
         assert_eq!(graph.cost(&path), 1);
     }
+
+    #[test]
+    fn loopy_edge() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+
+        let u = graph.insert_edge(a, a, Props { cost: 1 });
+        let v = graph.insert_edge(a, b, Props { cost: 2 });
+
+        assert_ne!(u, v);
+
+        let path = graph.best_path(a, &[b]).unwrap();
+
+        assert_eq!(path, [v]);
+        assert_eq!(graph.cost(&path), 2);
+    }
 }
