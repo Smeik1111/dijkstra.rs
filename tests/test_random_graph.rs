@@ -2,8 +2,8 @@ use dijkstra::graph::Graph;
 use dijkstra::types::Float;
 
 use serde::{Deserialize, Serialize};
-use std::path::Path;
 use std::fs;
+use std::path::Path;
 
 type Cost = f64;
 
@@ -31,7 +31,8 @@ impl dijkstra::graph::Cost for Props {
 fn read_and_search() {
     let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/random_graph.json");
     let json = fs::read_to_string(file).expect("failed to read from json file");
-    let graph: Graph<State, Props> = serde_json::from_str(&json).expect("failed to deserialise graph");
+    let graph: Graph<State, Props> =
+        serde_json::from_str(&json).expect("failed to deserialise graph");
     let path = graph.best_path(0, &[23, 24, 25]).unwrap();
     assert_eq!(path, [72, 98, 6, 79, 94]);
     assert_eq!(graph.edge(path[0]).from, 0);
@@ -45,8 +46,8 @@ fn read_and_search() {
 
 #[test]
 fn make() {
-// a sample graph with 26 nodes (letter of the alphabet)
-// and 100 random edges with uniformly random cost sampled from [0, 1).
+    // a sample graph with 26 nodes (letter of the alphabet)
+    // and 100 random edges with uniformly random cost sampled from [0, 1).
     let mut graph = Graph::new();
     for c in b'a'..=b'z' {
         graph.insert_node(State { name: c as char });
@@ -58,7 +59,8 @@ fn make() {
         graph.insert_edge(from, to, Props { cost: Float(cost) });
     }
     let json = serde_json::to_string(&graph).expect("failed to serialise generated graph");
-    let graph: Graph<State, Props> = serde_json::from_str(&json).expect("failed to deserialise generated graph");
+    let graph: Graph<State, Props> =
+        serde_json::from_str(&json).expect("failed to deserialise generated graph");
     assert_eq!(graph.num_nodes(), 26);
     assert_eq!(graph.num_edges(), 100);
 }
