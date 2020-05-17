@@ -111,22 +111,17 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
                 break;
             }
             is_closed[from] = true;
-            for &edge_id in self.nodes[from].outgoing.iter() {
-                let to = self.edges[edge_id].to;
-                if to == from || is_closed[to] {
-                    // skip loopy edges (they just increase cost) or edges that end at a closed node,
-                    // since we're using priority queue and thus a closed node already has the best cost and incoming
-                    continue;
+            for (edge_id, to, to_cost) in self.nodes[from].outgoing.iter()
+                .filter(|&&id| self.edges[id].to != from && !is_closed[self.edges[id].to])
+                .map(|&id| (id, self.edges[id].to, from_cost + self.props[id].cost())) {
+                    if best_cost[to].is_none() || to_cost < best_cost[to].unwrap() {
+                        best_cost[to] = Some(to_cost);
+                        best_incoming[to] = Some(edge_id);
+                        queue.insert(to, to_cost);
+                        // the queue might still have the old more expensive items for 'to',
+                        // but they will be discarded when they eventually get to the front of the queue
+                    }
                 }
-                let to_cost = from_cost + self.props[edge_id].cost();
-                if best_cost[to].is_none() || to_cost < best_cost[to].unwrap() {
-                    best_cost[to] = Some(to_cost);
-                    best_incoming[to] = Some(edge_id);
-                    queue.insert(to, to_cost);
-                    // the queue might still have the old more expensive items for 'to',
-                    // but they will be discarded when they eventually get to the front of the queue
-                }
-            }
         }
         // then find the cheapest path walking back from the cheapest target via the cheapest incoming edges
         let cheapest_target: Option<NodeId> = targets
