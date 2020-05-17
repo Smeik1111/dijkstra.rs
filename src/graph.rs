@@ -101,6 +101,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         // from the source, use breadth-first search to find the cheapest incoming edge for each node
         let mut best_incoming = vec![None; self.nodes.len()];
         let mut best_cost = vec![None; self.nodes.len()];
+        let mut best_target = None;
         let mut is_closed = vec![false; self.nodes.len()];
         let mut queue = priority_queue::Heap::<<EdgeProps as Cost>::Type>::new();
         queue.insert(source, EdgeProps::zero_cost());
@@ -108,6 +109,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
             let (from, from_cost) = queue.extract_min().unwrap();
             if targets.contains(&from) {
                 // all other targets are going to be more expensive, since we're using priority queue
+                best_target = Some(from);
                 break;
             }
             is_closed[from] = true;
@@ -130,12 +132,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
             }
         }
         // then find the cheapest path walking back from the cheapest target via the cheapest incoming edges
-        let cheapest_target: Option<NodeId> = targets
-            .iter()
-            .cloned()
-            .filter(|&target| best_cost[target].is_some())
-            .min_by_key(|&target| best_cost[target].unwrap());
-        let mut node_id = cheapest_target?;
+        let mut node_id = best_target?;
         let mut path = Vec::new();
         while node_id != source {
             if let Some(edge_id) = best_incoming[node_id] {
