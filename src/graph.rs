@@ -311,4 +311,14 @@ mod tests {
         assert_eq!(path, [v]);
         assert_eq!(graph.cost(&path), 2);
     }
+
+    #[test]
+    fn disconnected() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+
+        let path = graph.best_path(a, &[b]);
+        assert!(path.is_none());
+    }
 }
