@@ -169,10 +169,32 @@ mod tests {
         let a = graph.insert_node(State { name: 'a' });
         let b = graph.insert_node(State { name: 'b' });
         let c = graph.insert_node(State { name: 'c' });
+        let d = graph.insert_node(State { name: 'd' });
 
+        let ab = graph.insert_edge(a, b, Props { cost: 1 });
+        let bc = graph.insert_edge(b, c, Props { cost: 1 });
+        let ad = graph.insert_edge(a, d, Props { cost: 1 });
+        let dc = graph.insert_edge(d, c, Props { cost: 1 });
+
+        assert_eq!(graph.node(a).id, a);
+        assert!(graph.node(a).incoming.is_empty());
+        assert_eq!(graph.node(a).outgoing, [ab, ad]);
         assert_eq!(graph.state(a).name, 'a');
+
+        assert_eq!(graph.node(b).id, b);
+        assert_eq!(graph.node(b).incoming, [ab]);
+        assert_eq!(graph.node(b).outgoing, [bc]);
         assert_eq!(graph.state(b).name, 'b');
+
+        assert_eq!(graph.node(c).id, c);
+        assert_eq!(graph.node(c).incoming, [bc, dc]);
+        assert!(graph.node(c).outgoing.is_empty());
         assert_eq!(graph.state(c).name, 'c');
+
+        assert_eq!(graph.node(d).id, d);
+        assert_eq!(graph.node(d).incoming, [ad]);
+        assert_eq!(graph.node(d).outgoing, [dc]);
+        assert_eq!(graph.state(d).name, 'd');
     }
 
     #[test]
@@ -180,17 +202,13 @@ mod tests {
         let mut graph: Graph<State, Props> = Graph::new();
         let a = graph.insert_node(State { name: 'a' });
         let b = graph.insert_node(State { name: 'b' });
-        let c = graph.insert_node(State { name: 'c' });
 
         let ab = graph.insert_edge(a, b, Props { cost: 1 });
-        let bc = graph.insert_edge(b, c, Props { cost: 2 });
 
-        assert_eq!(graph.props(ab).cost, 1);
-        assert_eq!(graph.props(bc).cost, 2);
+        assert_eq!(graph.edge(ab).id, ab);
         assert_eq!(graph.edge(ab).from, a);
-        assert_eq!(graph.edge(bc).from, b);
         assert_eq!(graph.edge(ab).to, b);
-        assert_eq!(graph.edge(bc).to, c);
+        assert_eq!(graph.props(ab).cost, 1);
     }
 
     #[test]
@@ -203,17 +221,50 @@ mod tests {
 
         graph.insert_edge(a, b, Props { cost: 1 });
         graph.insert_edge(b, d, Props { cost: 11 });
-        graph.insert_edge(a, c, Props { cost: 2 });
-        graph.insert_edge(c, d, Props { cost: 5 });
+        let ac = graph.insert_edge(a, c, Props { cost: 2 });
+        let cd = graph.insert_edge(c, d, Props { cost: 5 });
         graph.insert_edge(c, b, Props { cost: 3 });
 
+        // three paths are possible from a to d: ab-bd (cost 12), ac-cd (cost 7), and ac-cb-bd (cost 16)
         let path = graph.best_path(a, &[d]).unwrap();
 
-        assert_eq!(path.len(), 2);
-        assert_eq!(graph.edge(path[0]).from, a);
-        assert_eq!(graph.edge(path[0]).to, c);
-        assert_eq!(graph.edge(path[1]).from, c);
-        assert_eq!(graph.edge(path[1]).to, d);
+        assert_eq!(path, [ac, cd]);
         assert_eq!(graph.cost(&path), 7);
+    }
+
+    #[test]
+    fn two_targets() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+        let c = graph.insert_node(State { name: 'c' });
+
+        graph.insert_edge(a, b, Props { cost: 2 });
+        let ac = graph.insert_edge(a, c, Props { cost: 1 });
+
+        let path = graph.best_path(a, &[b, c]).unwrap();
+
+        assert_eq!(path, [ac]);
+        assert_eq!(graph.cost(&path), 1);
+    }
+
+    #[test]
+    fn multi_edge() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+
+        let u = graph.insert_edge(a, b, Props { cost: 3 });
+        let v = graph.insert_edge(a, b, Props { cost: 2 });
+        let w = graph.insert_edge(a, b, Props { cost: 1 });
+
+        assert_ne!(u, v);
+        assert_ne!(u, w);
+        assert_ne!(v, w);
+
+        let path = graph.best_path(a, &[b]).unwrap();
+
+        assert_eq!(path, [w]);
+        assert_eq!(graph.cost(&path), 1);
     }
 }
