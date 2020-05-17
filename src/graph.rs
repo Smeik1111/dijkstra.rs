@@ -106,6 +106,10 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         queue.insert(source, EdgeProps::zero_cost());
         while !queue.is_empty() {
             let (from, from_cost) = queue.extract_min().unwrap();
+            if targets.contains(&from) {
+                // all other targets are going to be more expensive, since we're using priority queue
+                break;
+            }
             is_closed[from] = true;
             for &edge_id in self.nodes[from].outgoing.iter() {
                 let to = self.edges[edge_id].to;
@@ -239,7 +243,7 @@ mod tests {
     }
 
     #[test]
-    fn two_targets() {
+    fn fork() {
         let mut graph: Graph<State, Props> = Graph::new();
         let a = graph.insert_node(State { name: 'a' });
         let b = graph.insert_node(State { name: 'b' });
@@ -252,6 +256,22 @@ mod tests {
 
         assert_eq!(path, [ac]);
         assert_eq!(graph.cost(&path), 1);
+    }
+
+    #[test]
+    fn chain() {
+        let mut graph: Graph<State, Props> = Graph::new();
+        let a = graph.insert_node(State { name: 'a' });
+        let b = graph.insert_node(State { name: 'b' });
+        let c = graph.insert_node(State { name: 'c' });
+
+        let ab = graph.insert_edge(a, b, Props { cost: 2 });
+        graph.insert_edge(b, c, Props { cost: 1 });
+
+        let path = graph.best_path(a, &[b, c]).unwrap();
+
+        assert_eq!(path, [ab]);
+        assert_eq!(graph.cost(&path), 2);
     }
 
     #[test]
