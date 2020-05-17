@@ -50,11 +50,17 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn node(&self, id: NodeId) -> &Node {
         &self.nodes[id]
     }
-    pub fn state(&self, id: NodeId) -> &NodeState {
-        &self.states[id]
-    }
     pub fn edge(&self, id: EdgeId) -> &Edge {
         &self.edges[id]
+    }
+    pub fn num_nodes(&self) -> usize {
+        self.nodes.len()
+    }
+    pub fn num_edges(&self) -> usize {
+        self.edges.len()
+    }
+    pub fn state(&self, id: NodeId) -> &NodeState {
+        &self.states[id]
     }
     pub fn props(&self, id: EdgeId) -> &EdgeProps {
         &self.props[id]
