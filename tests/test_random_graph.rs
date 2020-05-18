@@ -4,8 +4,6 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
 
-type Cost = f64;
-
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct State {
     name: char,
@@ -13,16 +11,12 @@ pub struct State {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Props {
-    cost: Cost,
+    cost: f64,
 }
 
 impl dijkstra::graph::Cost for Props {
-    type Type = Cost;
-    fn cost(&self) -> Self::Type {
+    fn cost(&self) -> f64 {
         self.cost
-    }
-    fn zero_cost() -> Self::Type {
-        0.0
     }
 }
 
@@ -54,7 +48,7 @@ fn make() {
     for _ in 0..100 {
         let from = (rand::random::<u8>() / 10) as usize;
         let to = (rand::random::<u8>() / 10) as usize;
-        let cost = rand::random::<Cost>();
+        let cost = rand::random::<f64>();
         graph.insert_edge(from, to, Props { cost: cost });
     }
     let json = serde_json::to_string(&graph).expect("failed to serialise generated graph");

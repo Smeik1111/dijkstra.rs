@@ -1,7 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
-use std::iter::Sum;
-use std::ops::Add;
 
 use crate::priority_queue;
 
@@ -30,13 +28,11 @@ pub struct Edge {
 }
 
 pub trait Cost {
-    type Type: Debug + Copy + PartialOrd + PartialEq + Add<Output = Self::Type> + Sum;
-    fn cost(&self) -> Self::Type;
-    fn zero_cost() -> Self::Type;
+    fn cost(&self) -> f64;
 }
 
-type NodeId = usize;
-type EdgeId = usize;
+pub type NodeId = usize;
+pub type EdgeId = usize;
 
 impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
@@ -65,7 +61,7 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
     pub fn props(&self, id: EdgeId) -> &EdgeProps {
         &self.props[id]
     }
-    pub fn cost(&self, path: &[EdgeId]) -> <EdgeProps as Cost>::Type {
+    pub fn cost(&self, path: &[EdgeId]) -> f64 {
         path.iter()
             .cloned()
             .map(|edge_id| self.props[edge_id].cost())
@@ -103,8 +99,8 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
         let mut best_cost = vec![None; self.nodes.len()];
         let mut best_target = None;
         let mut is_closed = vec![false; self.nodes.len()];
-        let mut queue = priority_queue::Heap::<<EdgeProps as Cost>::Type>::new();
-        queue.insert(source, EdgeProps::zero_cost());
+        let mut queue = priority_queue::Heap::<f64>::new();
+        queue.insert(source, 0.0);
         while !queue.is_empty() {
             let (from, from_cost) = queue.extract_min().unwrap();
             if targets.contains(&from) {
@@ -162,12 +158,8 @@ mod tests {
     }
 
     impl Cost for Props {
-        type Type = u8;
-        fn cost(&self) -> Self::Type {
-            self.cost
-        }
-        fn zero_cost() -> Self::Type {
-            0
+        fn cost(&self) -> f64 {
+            self.cost as f64
         }
     }
 
