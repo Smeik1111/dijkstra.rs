@@ -35,8 +35,8 @@ fn main() {
         id_from((N - 1,N - 1, N - 2)),
     ];
     if let Some(path) = graph.best_path(source, &targets) {
-        println!("{:?}", path);
-        println!("{:?}", graph.cost(&path));
+        eprintln!("{:?}", path);
+        eprintln!("{:?}", graph.cost(&path));
     }
     let graph: Graph<State, Props> =
        serde_json::from_str(&json).expect("failed to deserialise generated graph");
@@ -47,7 +47,7 @@ fn id_from(position: Position) -> usize {
     let j = position.1 as usize;
     let k = position.2 as usize;
     let n = N as usize;
-    n * n * i + n * j + k
+    n * (n * i + j) + k
 }
 
 fn position_from(id: usize) -> Position {
