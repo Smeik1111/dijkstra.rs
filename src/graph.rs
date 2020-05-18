@@ -229,7 +229,7 @@ mod tests {
         let path = graph.best_path(a, &[c]).unwrap();
 
         assert_eq!(path, [ad, dc]);
-        assert_eq!(graph.cost(&path), 30);
+        assert_eq!(graph.cost(&path), 30.0);
     }
 
     #[test]
@@ -245,7 +245,7 @@ mod tests {
         let path = graph.best_path(a, &[b, c]).unwrap();
 
         assert_eq!(path, [ac]);
-        assert_eq!(graph.cost(&path), 1);
+        assert_eq!(graph.cost(&path), 1.0);
     }
 
     #[test]
@@ -261,7 +261,7 @@ mod tests {
         let path = graph.best_path(a, &[b, c]).unwrap();
 
         assert_eq!(path, [ab]);
-        assert_eq!(graph.cost(&path), 2);
+        assert_eq!(graph.cost(&path), 2.0);
     }
 
     #[test]
@@ -281,7 +281,7 @@ mod tests {
         let path = graph.best_path(a, &[b]).unwrap();
 
         assert_eq!(path, [w]);
-        assert_eq!(graph.cost(&path), 1);
+        assert_eq!(graph.cost(&path), 1.0);
     }
 
     #[test]
@@ -298,7 +298,7 @@ mod tests {
         let path = graph.best_path(a, &[b]).unwrap();
 
         assert_eq!(path, [v]);
-        assert_eq!(graph.cost(&path), 2);
+        assert_eq!(graph.cost(&path), 2.0);
     }
 
     #[test]
