@@ -52,7 +52,7 @@ fn args() -> (NodeId, Vec<NodeId>) {
     let targets = matches
         .value_of("targets")
         .unwrap()
-        .split(",")
+        .split(',')
         .map(|target| target.parse::<usize>().expect("failed to parse targets"))
         .collect::<Vec<usize>>();
     (source, targets)
