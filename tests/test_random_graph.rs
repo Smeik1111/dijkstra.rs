@@ -1,5 +1,4 @@
 use dijkstra::graph::Graph;
-use dijkstra::types::Float;
 
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -14,16 +13,16 @@ pub struct State {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Props {
-    cost: Float<Cost>,
+    cost: Cost,
 }
 
 impl dijkstra::graph::Cost for Props {
-    type Type = Float<Cost>;
+    type Type = Cost;
     fn cost(&self) -> Self::Type {
         self.cost
     }
     fn zero_cost() -> Self::Type {
-        Float(Cost::default())
+        0.0
     }
 }
 
@@ -41,7 +40,7 @@ fn read_and_search() {
     assert_eq!(graph.edge(path[2]).to, graph.edge(path[3]).from);
     assert_eq!(graph.edge(path[3]).to, graph.edge(path[4]).from);
     assert_eq!(graph.edge(path[4]).to, 25);
-    assert_eq!(graph.cost(&path), Float(1.6849905966872787));
+    assert_eq!(graph.cost(&path), 1.6849905966872787);
 }
 
 #[test]
@@ -56,7 +55,7 @@ fn make() {
         let from = (rand::random::<u8>() / 10) as usize;
         let to = (rand::random::<u8>() / 10) as usize;
         let cost = rand::random::<Cost>();
-        graph.insert_edge(from, to, Props { cost: Float(cost) });
+        graph.insert_edge(from, to, Props { cost: cost });
     }
     let json = serde_json::to_string(&graph).expect("failed to serialise generated graph");
     let graph: Graph<State, Props> =

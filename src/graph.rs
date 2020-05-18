@@ -30,7 +30,7 @@ pub struct Edge {
 }
 
 pub trait Cost {
-    type Type: Debug + Copy + PartialOrd + PartialEq + Ord + Add<Output = Self::Type> + Sum;
+    type Type: Debug + Copy + PartialOrd + PartialEq + Add<Output = Self::Type> + Sum;
     fn cost(&self) -> Self::Type;
     fn zero_cost() -> Self::Type;
 }
