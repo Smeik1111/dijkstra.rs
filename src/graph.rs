@@ -1,5 +1,7 @@
+use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
+use std::marker::Sync;
 
 use crate::priority_queue;
 
@@ -34,7 +36,7 @@ pub trait Cost {
 pub type NodeId = usize;
 pub type EdgeId = usize;
 
-impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
+impl<NodeState: Debug + Sync, EdgeProps: Debug + Cost + Sync> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
         Graph {
             nodes: Vec::new(),
@@ -111,10 +113,10 @@ impl<NodeState: Debug, EdgeProps: Debug + Cost> Graph<NodeState, EdgeProps> {
             is_closed[from] = true;
             for (edge_id, edge_cost) in self.nodes[from]
                 .outgoing
-                .iter()
-                .filter(|&&id| self.edges[id].to != from)
-                .filter(|&&id| !is_closed[self.edges[id].to])
+                .par_iter()
+                .filter(|&&id| self.edges[id].to != from && !is_closed[self.edges[id].to])
                 .map(|&id| (id, self.props[id].cost()))
+                .collect::<Vec<_>>()
             {
                 let to = self.edges[edge_id].to;
                 let to_cost = from_cost + edge_cost;

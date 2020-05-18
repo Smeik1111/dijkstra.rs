@@ -1,5 +1,6 @@
 use clap::{App, Arg};
 use serde::{Deserialize, Serialize};
+use std::{thread, time};
 
 use dijkstra::graph::*;
 
@@ -23,6 +24,8 @@ struct Props {
 
 impl Cost for Props {
     fn cost(&self) -> f64 {
+        // simulating cost compute time
+        thread::sleep(time::Duration::from_millis(10));
         self.cost as f64
     }
 }
