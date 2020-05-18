@@ -18,7 +18,6 @@ pub struct Graph<NodeState: Debug, EdgeProps: Debug> {
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Node {
     pub id: NodeId,
-    pub incoming: Vec<EdgeId>,
     pub outgoing: Vec<EdgeId>,
 }
 
@@ -73,7 +72,6 @@ impl<NodeState: Debug + Sync, EdgeProps: Debug + Cost + Sync> Graph<NodeState, E
         let new_node_id = self.nodes.len();
         self.nodes.push(Node {
             id: new_node_id,
-            incoming: Vec::new(),
             outgoing: Vec::new(),
         });
         self.states.push(state);
@@ -88,7 +86,6 @@ impl<NodeState: Debug + Sync, EdgeProps: Debug + Cost + Sync> Graph<NodeState, E
         });
         self.props.push(props);
         self.nodes[from].outgoing.push(new_edge_id);
-        self.nodes[to].incoming.push(new_edge_id);
         new_edge_id
     }
     // find the cheapest path to any of the targets
@@ -179,22 +176,18 @@ mod tests {
         let dc = graph.insert_edge(d, c, Props { cost: 1 });
 
         assert_eq!(graph.node(a).id, a);
-        assert!(graph.node(a).incoming.is_empty());
         assert_eq!(graph.node(a).outgoing, [ab, ad]);
         assert_eq!(graph.state(a).name, 'a');
 
         assert_eq!(graph.node(b).id, b);
-        assert_eq!(graph.node(b).incoming, [ab]);
         assert_eq!(graph.node(b).outgoing, [bc]);
         assert_eq!(graph.state(b).name, 'b');
 
         assert_eq!(graph.node(c).id, c);
-        assert_eq!(graph.node(c).incoming, [bc, dc]);
         assert!(graph.node(c).outgoing.is_empty());
         assert_eq!(graph.state(c).name, 'c');
 
         assert_eq!(graph.node(d).id, d);
-        assert_eq!(graph.node(d).incoming, [ad]);
         assert_eq!(graph.node(d).outgoing, [dc]);
         assert_eq!(graph.state(d).name, 'd');
     }
