@@ -35,7 +35,6 @@ pub trait Cost {
     fn cost(&self) -> f64;
 }
 
-
 impl<NodeState: Debug + Sync, EdgeProps: Debug + Cost + Sync> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
         Graph {
