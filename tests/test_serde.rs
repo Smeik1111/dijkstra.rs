@@ -1,4 +1,4 @@
-use dijkstra::graph::Graph;
+use dijkstra::graph::{Cost, Graph};
 
 use serde::{Deserialize, Serialize};
 use std::fs;
@@ -14,7 +14,7 @@ pub struct Props {
     cost: f64,
 }
 
-impl dijkstra::graph::Cost for Props {
+impl Cost for Props {
     fn cost(&self) -> f64 {
         self.cost
     }
@@ -22,7 +22,7 @@ impl dijkstra::graph::Cost for Props {
 
 #[test]
 fn read_and_search() {
-    let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/random_graph.json");
+    let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/graph.json");
     let json = fs::read_to_string(file).expect("failed to read from json file");
     let graph: Graph<State, Props> =
         serde_json::from_str(&json).expect("failed to deserialise graph");
@@ -41,7 +41,7 @@ fn read_and_search() {
 fn make() {
     // a sample graph with 26 nodes (letter of the alphabet)
     // and 100 random edges with uniformly random cost sampled from [0, 1).
-    let mut graph = Graph::new();
+    let mut graph: Graph<State, Props> = Graph::new();
     for c in b'a'..=b'z' {
         graph.insert_node(State { name: c as char });
     }
