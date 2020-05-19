@@ -7,28 +7,18 @@ use crate::priority_queue;
 
 // data-oriented graph with user-defined node states and edge props;
 // nodes and edges can be inserted but not deleted
-pub type Graph<NodeState, EdgeProps> = GenericGraph<NodeState, EdgeProps, Vec<EdgeId>>;
-
 #[derive(Debug, Default, Deserialize, Serialize)]
-pub struct GenericGraph<NodeState: Debug, EdgeProps: Debug, OutgoingEdgeIds>
-where
-    for<'a> &'a OutgoingEdgeIds: rayon::iter::IntoParallelIterator<Item = &'a EdgeId>,
-    OutgoingEdgeIds: Default + Sync + InsertEdge,
-{
-    nodes: Vec<Node<OutgoingEdgeIds>>,
+pub struct Graph<NodeState: Debug, EdgeProps: Debug> {
+    nodes: Vec<Node>,
     edges: Vec<Edge>,
     states: Vec<NodeState>,
     props: Vec<EdgeProps>,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
-pub struct Node<OutgoingEdgeIds>
-where
-    for<'a> &'a OutgoingEdgeIds: rayon::iter::IntoParallelIterator<Item = &'a EdgeId>,
-    OutgoingEdgeIds: Default + Sync + InsertEdge,
-{
+pub struct Node {
     pub id: NodeId,
-    pub outgoing: OutgoingEdgeIds,
+    pub outgoing: Vec<EdgeId>,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
@@ -45,31 +35,17 @@ pub trait Cost {
     fn cost(&self) -> f64;
 }
 
-pub trait InsertEdge {
-    fn insert_edge(&mut self, edge_id: EdgeId);
-}
 
-impl InsertEdge for Vec<EdgeId> {
-    fn insert_edge(&mut self, edge_id: EdgeId) {
-        self.push(edge_id);
-    }
-}
-
-impl<NodeState: Debug + Sync, EdgeProps: Debug + Cost + Sync, OutgoingEdgeIds>
-    GenericGraph<NodeState, EdgeProps, OutgoingEdgeIds>
-where
-    for<'a> &'a OutgoingEdgeIds: rayon::iter::IntoParallelIterator<Item = &'a EdgeId>,
-    OutgoingEdgeIds: Default + Sync + InsertEdge,
-{
+impl<NodeState: Debug + Sync, EdgeProps: Debug + Cost + Sync> Graph<NodeState, EdgeProps> {
     pub fn new() -> Self {
-        GenericGraph {
+        Graph {
             nodes: Vec::new(),
             edges: Vec::new(),
             states: Vec::new(),
             props: Vec::new(),
         }
     }
-    pub fn node(&self, id: NodeId) -> &Node<OutgoingEdgeIds> {
+    pub fn node(&self, id: NodeId) -> &Node {
         &self.nodes[id]
     }
     pub fn edge(&self, id: EdgeId) -> &Edge {
@@ -97,7 +73,7 @@ where
         let new_node_id = self.nodes.len();
         self.nodes.push(Node {
             id: new_node_id,
-            outgoing: OutgoingEdgeIds::default(),
+            outgoing: Vec::new(),
         });
         self.states.push(state);
         new_node_id
@@ -110,7 +86,7 @@ where
             to,
         });
         self.props.push(props);
-        self.nodes[from].outgoing.insert_edge(new_edge_id);
+        self.nodes[from].outgoing.push(new_edge_id);
         new_edge_id
     }
     // find the cheapest path to any of the targets
@@ -135,7 +111,7 @@ where
             is_closed[from] = true;
             for (edge_id, edge_cost) in self.nodes[from]
                 .outgoing
-                .into_par_iter()
+                .par_iter()
                 .filter(|&&id| self.edges[id].to != from && !is_closed[self.edges[id].to])
                 .map(|&id| (id, self.props[id].cost()))
                 .collect::<Vec<_>>()
