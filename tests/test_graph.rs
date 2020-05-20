@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use dijkstra::graph::{Cost, Graph};
+use dijkstra::graph::{Advance, Graph};
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct State {
     name: char,
+    cost: Option<f64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -12,19 +13,28 @@ struct Props {
     cost: u8,
 }
 
-impl Cost for Props {
-    fn cost(&self) -> f64 {
-        self.cost as f64
+impl Advance<State, Props> for State {
+    fn advance(&self, edge_props: &Props) -> State {
+        State {
+            name: self.name,
+            cost: Some(self.cost.unwrap_or(0.0) + edge_props.cost as f64),
+        }
+    }
+    fn update(&mut self, node_state: State) {
+        self.cost = node_state.cost;
+    }
+    fn cost(&self) -> Option<f64> {
+        self.cost
     }
 }
 
 #[test]
 fn node_state() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
-    let c = graph.insert_node(State { name: 'c' });
-    let d = graph.insert_node(State { name: 'd' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
+    let c = graph.insert_node(State { name: 'c', cost: None });
+    let d = graph.insert_node(State { name: 'd', cost: None });
 
     let ab = graph.insert_edge(a, b, Props { cost: 1 });
     let bc = graph.insert_edge(b, c, Props { cost: 1 });
@@ -51,8 +61,8 @@ fn node_state() {
 #[test]
 fn edge_props() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
 
     let ab = graph.insert_edge(a, b, Props { cost: 1 });
 
@@ -65,10 +75,10 @@ fn edge_props() {
 #[test]
 fn best_path() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
-    let c = graph.insert_node(State { name: 'c' });
-    let d = graph.insert_node(State { name: 'd' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
+    let c = graph.insert_node(State { name: 'c', cost: None });
+    let d = graph.insert_node(State { name: 'd', cost: None });
 
     graph.insert_edge(a, b, Props { cost: 1 });
     graph.insert_edge(b, c, Props { cost: 90 });
@@ -80,15 +90,15 @@ fn best_path() {
     let path = graph.best_path(a, &[c]).unwrap();
 
     assert_eq!(path, [ad, dc]);
-    assert_eq!(graph.cost(&path), 30.0);
+    assert_eq!(graph.state(c).cost, Some(30.0));
 }
 
 #[test]
 fn fork() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
-    let c = graph.insert_node(State { name: 'c' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
+    let c = graph.insert_node(State { name: 'c', cost: None });
 
     graph.insert_edge(a, b, Props { cost: 2 });
     let ac = graph.insert_edge(a, c, Props { cost: 1 });
@@ -96,15 +106,15 @@ fn fork() {
     let path = graph.best_path(a, &[b, c]).unwrap();
 
     assert_eq!(path, [ac]);
-    assert_eq!(graph.cost(&path), 1.0);
+    assert_eq!(graph.state(c).cost, Some(1.0));
 }
 
 #[test]
 fn chain() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
-    let c = graph.insert_node(State { name: 'c' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
+    let c = graph.insert_node(State { name: 'c', cost: None });
 
     let ab = graph.insert_edge(a, b, Props { cost: 2 });
     graph.insert_edge(b, c, Props { cost: 1 });
@@ -112,14 +122,14 @@ fn chain() {
     let path = graph.best_path(a, &[b, c]).unwrap();
 
     assert_eq!(path, [ab]);
-    assert_eq!(graph.cost(&path), 2.0);
+    assert_eq!(graph.state(b).cost, Some(2.0));
 }
 
 #[test]
 fn multi_edge() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
 
     let u = graph.insert_edge(a, b, Props { cost: 3 });
     let v = graph.insert_edge(a, b, Props { cost: 2 });
@@ -132,14 +142,14 @@ fn multi_edge() {
     let path = graph.best_path(a, &[b]).unwrap();
 
     assert_eq!(path, [w]);
-    assert_eq!(graph.cost(&path), 1.0);
+    assert_eq!(graph.state(b).cost, Some(1.0));
 }
 
 #[test]
 fn loopy_edge() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
 
     let u = graph.insert_edge(a, a, Props { cost: 1 });
     let v = graph.insert_edge(a, b, Props { cost: 2 });
@@ -149,14 +159,14 @@ fn loopy_edge() {
     let path = graph.best_path(a, &[b]).unwrap();
 
     assert_eq!(path, [v]);
-    assert_eq!(graph.cost(&path), 2.0);
+    assert_eq!(graph.state(b).cost, Some(2.0));
 }
 
 #[test]
 fn disconnected() {
     let mut graph: Graph<State, Props> = Graph::new();
-    let a = graph.insert_node(State { name: 'a' });
-    let b = graph.insert_node(State { name: 'b' });
+    let a = graph.insert_node(State { name: 'a', cost: None });
+    let b = graph.insert_node(State { name: 'b', cost: None });
 
     let path = graph.best_path(a, &[b]);
     assert!(path.is_none());

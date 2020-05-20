@@ -9,6 +9,6 @@ Run as
 which sould yield
 
     path: [178, 0, 20, 156, 321, 524, 725, 891, 1036, 1175, 1331, 1514, 1355, 1518, 1343, 1539, 1379, 1569, 1586, 1597, 1611, 1468, 1643, 1656, 1645, 1474, 1309, 1511, 1658]
-    cost: 574
+    cost: 574.0
 
 for a search on a 3d grid with 10 nodes along each dimension, where each node is connected to some of its neighbours on the grid via edges with some randomly assigned cost. The grid is taken from graph.zip, a zipped json file with the serialisation of the graph data structs.

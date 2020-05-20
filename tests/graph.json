@@ -2,12 +2,6 @@
   "nodes": [
     {
       "id": 0,
-      "incoming": [
-        15,
-        46,
-        57,
-        71
-      ],
       "outgoing": [
         15,
         28,
@@ -16,16 +10,6 @@
     },
     {
       "id": 1,
-      "incoming": [
-        3,
-        8,
-        10,
-        21,
-        48,
-        73,
-        81,
-        89
-      ],
       "outgoing": [
         2,
         19,
@@ -34,13 +18,6 @@
     },
     {
       "id": 2,
-      "incoming": [
-        0,
-        2,
-        9,
-        95,
-        99
-      ],
       "outgoing": [
         17,
         43
@@ -48,13 +25,6 @@
     },
     {
       "id": 3,
-      "incoming": [
-        11,
-        23,
-        70,
-        86,
-        91
-      ],
       "outgoing": [
         7,
         57,
@@ -63,19 +33,6 @@
     },
     {
       "id": 4,
-      "incoming": [
-        1,
-        12,
-        17,
-        19,
-        20,
-        34,
-        38,
-        74,
-        92,
-        93,
-        98
-      ],
       "outgoing": [
         6,
         34,
@@ -84,9 +41,6 @@
     },
     {
       "id": 5,
-      "incoming": [
-        51
-      ],
       "outgoing": [
         48,
         76,
@@ -96,9 +50,6 @@
     },
     {
       "id": 6,
-      "incoming": [
-        13
-      ],
       "outgoing": [
         39,
         52,
@@ -109,10 +60,6 @@
     },
     {
       "id": 7,
-      "incoming": [
-        18,
-        52
-      ],
       "outgoing": [
         23,
         75
@@ -120,10 +67,6 @@
     },
     {
       "id": 8,
-      "incoming": [
-        66,
-        82
-      ],
       "outgoing": [
         22,
         74,
@@ -132,15 +75,6 @@
     },
     {
       "id": 9,
-      "incoming": [
-        7,
-        22,
-        24,
-        32,
-        33,
-        36,
-        40
-      ],
       "outgoing": [
         27,
         38,
@@ -152,11 +86,6 @@
     },
     {
       "id": 10,
-      "incoming": [
-        14,
-        26,
-        42
-      ],
       "outgoing": [
         45,
         81
@@ -164,15 +93,6 @@
     },
     {
       "id": 11,
-      "incoming": [
-        31,
-        35,
-        43,
-        45,
-        62,
-        76,
-        87
-      ],
       "outgoing": [
         0,
         5,
@@ -185,12 +105,6 @@
     },
     {
       "id": 12,
-      "incoming": [
-        63,
-        64,
-        80,
-        84
-      ],
       "outgoing": [
         36,
         44,
@@ -200,10 +114,6 @@
     },
     {
       "id": 13,
-      "incoming": [
-        27,
-        59
-      ],
       "outgoing": [
         29,
         49,
@@ -213,12 +123,6 @@
     },
     {
       "id": 14,
-      "incoming": [
-        5,
-        60,
-        79,
-        97
-      ],
       "outgoing": [
         10,
         91,
@@ -227,14 +131,6 @@
     },
     {
       "id": 15,
-      "incoming": [
-        39,
-        47,
-        55,
-        56,
-        65,
-        68
-      ],
       "outgoing": [
         16,
         53,
@@ -244,11 +140,6 @@
     },
     {
       "id": 16,
-      "incoming": [
-        16,
-        28,
-        77
-      ],
       "outgoing": [
         25,
         32,
@@ -259,12 +150,6 @@
     },
     {
       "id": 17,
-      "incoming": [
-        4,
-        50,
-        67,
-        72
-      ],
       "outgoing": [
         4,
         35,
@@ -274,13 +159,6 @@
     },
     {
       "id": 18,
-      "incoming": [
-        29,
-        54,
-        75,
-        83,
-        96
-      ],
       "outgoing": [
         11,
         13,
@@ -293,11 +171,6 @@
     },
     {
       "id": 19,
-      "incoming": [
-        37,
-        58,
-        85
-      ],
       "outgoing": [
         3,
         26,
@@ -307,13 +180,6 @@
     },
     {
       "id": 20,
-      "incoming": [
-        44,
-        49,
-        61,
-        88,
-        90
-      ],
       "outgoing": [
         20,
         40,
@@ -322,10 +188,6 @@
     },
     {
       "id": 21,
-      "incoming": [
-        6,
-        69
-      ],
       "outgoing": [
         1,
         9,
@@ -337,10 +199,6 @@
     },
     {
       "id": 22,
-      "incoming": [
-        25,
-        78
-      ],
       "outgoing": [
         18,
         21,
@@ -349,9 +207,6 @@
     },
     {
       "id": 23,
-      "incoming": [
-        41
-      ],
       "outgoing": [
         12,
         60,
@@ -360,10 +215,6 @@
     },
     {
       "id": 24,
-      "incoming": [
-        30,
-        53
-      ],
       "outgoing": [
         33,
         42,
@@ -373,9 +224,6 @@
     },
     {
       "id": 25,
-      "incoming": [
-        94
-      ],
       "outgoing": [
         8,
         30,
@@ -385,82 +233,108 @@
   ],
   "states": [
     {
-      "name": "a"
+      "name": "a",
+      "cost": null
     },
     {
-      "name": "b"
+      "name": "b",
+      "cost": null
     },
     {
-      "name": "c"
+      "name": "c",
+      "cost": null
     },
     {
-      "name": "d"
+      "name": "d",
+      "cost": null
     },
     {
-      "name": "e"
+      "name": "e",
+      "cost": null
     },
     {
-      "name": "f"
+      "name": "f",
+      "cost": null
     },
     {
-      "name": "g"
+      "name": "g",
+      "cost": null
     },
     {
-      "name": "h"
+      "name": "h",
+      "cost": null
     },
     {
-      "name": "i"
+      "name": "i",
+      "cost": null
     },
     {
-      "name": "j"
+      "name": "j",
+      "cost": null
     },
     {
-      "name": "k"
+      "name": "k",
+      "cost": null
     },
     {
-      "name": "l"
+      "name": "l",
+      "cost": null
     },
     {
-      "name": "m"
+      "name": "m",
+      "cost": null
     },
     {
-      "name": "n"
+      "name": "n",
+      "cost": null
     },
     {
-      "name": "o"
+      "name": "o",
+      "cost": null
     },
     {
-      "name": "p"
+      "name": "p",
+      "cost": null
     },
     {
-      "name": "q"
+      "name": "q",
+      "cost": null
     },
     {
-      "name": "r"
+      "name": "r",
+      "cost": null
     },
     {
-      "name": "s"
+      "name": "s",
+      "cost": null
     },
     {
-      "name": "t"
+      "name": "t",
+      "cost": null
     },
     {
-      "name": "u"
+      "name": "u",
+      "cost": null
     },
     {
-      "name": "v"
+      "name": "v",
+      "cost": null
     },
     {
-      "name": "w"
+      "name": "w",
+      "cost": null
     },
     {
-      "name": "x"
+      "name": "x",
+      "cost": null
     },
     {
-      "name": "y"
+      "name": "y",
+      "cost": null
     },
     {
-      "name": "z"
+      "name": "z",
+      "cost": null
     }
   ],
   "edges": [

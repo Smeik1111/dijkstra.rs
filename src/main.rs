@@ -6,27 +6,39 @@ use dijkstra::graph::*;
 
 fn main() {
     let (source, targets) = args();
-    let graph: Graph<State, Props> =
+    let mut graph: Graph<State, Props> =
         serde_json::from_reader(std::io::stdin()).expect("failed to deserialise graph");
+    graph.state_mut(source).cost = Some(0.0);
     if let Some(path) = graph.best_path(source, &targets) {
         println!("path: {:?}", path);
-        println!("cost: {:?}", graph.cost(&path) as u64);
+        let target = graph.edge(*path.last().unwrap()).to;
+        println!("cost: {:?}", graph.state(target).cost.unwrap());
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct State;
+struct State {
+    cost: Option<f64>,
+}
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 struct Props {
     cost: u8,
 }
 
-impl Cost for Props {
-    fn cost(&self) -> f64 {
-        // simulating cost compute time
+impl Advance<State, Props> for State {
+    fn advance(&self, edge_props: &Props) -> State {
+        // simulating compute time
         thread::sleep(time::Duration::from_millis(10));
-        self.cost as f64
+        State {
+            cost: Some(self.cost.unwrap() + edge_props.cost as f64),
+        }
+    }
+    fn update(&mut self, node_state: State) {
+        self.cost = node_state.cost;
+    }
+    fn cost(&self) -> Option<f64> {
+        self.cost
     }
 }
 
