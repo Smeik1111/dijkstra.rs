@@ -18,4 +18,4 @@ which sould yield
 for a search on a 3d grid with 10 nodes along each dimension, where each node is connected to some of its neighbours on the grid via edges with some randomly assigned cost. The grid is taken from graph.zip, a zipped json file with the serialisation of the graph data structs.
 The path is a sequence of edge ids, where the from node id of edge 178 is node id 111, and the to node id of edge 1658 is node id 998.
 
-The search uses rayon library to parallelise computations along outgoing edges of a given node, improving performance by 50% for the example graph used above.
+The search uses rayon library to parallelise computations along outgoing edges of a given node, improving performance by about 40% for the example graph used above, from 4.1 seconds to 2.6 seconds on i7-4785T CPU @ 2.20GHz × 4. An artificial delay of 10 milliseconds was added for each advance call to simulate the compute time required to advance state.
