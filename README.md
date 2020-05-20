@@ -16,6 +16,6 @@ which sould yield
     cost: 574.0
 
 for a search on a 3d grid with 10 nodes along each dimension, where each node is connected to some of its neighbours on the grid via edges with some randomly assigned cost. The grid is taken from graph.zip, a zipped json file with the serialisation of the graph data structs.
-The path is a sequence of edges ids, where the from node id of edge 178 is node id 1, and the to node id of edge 1658 is node id 25.
+The path is a sequence of edge ids, where the from node id of edge 178 is node id 111, and the to node id of edge 1658 is node id 998.
 
 The search uses rayon library to parallelise computations along outgoing edges of a given node, improving performance by 50% for the example graph used above.
