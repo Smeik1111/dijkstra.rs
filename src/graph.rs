@@ -88,13 +88,16 @@ where
                 break;
             }
             is_closed[from] = true;
-            let outgoing_edges = self.nodes[from]
+            let outgoing_edge_ids = self.nodes[from]
                 .outgoing
                 .iter()
                 .cloned()
-                .filter(|&edge_id| self.edges[edge_id].to != from && !is_closed[self.edges[edge_id].to])
+                .filter(|&edge_id| {
+                    let to = self.edges[edge_id].to;
+                    to != from && !is_closed[to]
+                })
                 .collect::<Vec<_>>();
-            for (edge_id, state) in outgoing_edges
+            for (edge_id, state) in outgoing_edge_ids
                 .par_iter()
                 .map(|&edge_id| (edge_id, self.states[from].advance(&self.props[edge_id])))
                 .collect::<Vec<_>>()
