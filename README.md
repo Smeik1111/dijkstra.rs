@@ -8,14 +8,17 @@ The search from the source node id to the target node ids relies on the user def
 
 Run as
 
-    unzip -p graph.zip | cargo run -- --source=111 --targets=899,989,998
+    cargo build --release
+    time cargo run --release -- --source=0 --targets=999 < <( unzip -p graph.zip )
 
 which sould yield
 
-    path: [178, 0, 20, 156, 321, 524, 725, 891, 1036, 1175, 1331, 1514, 1355, 1518, 1343, 1539, 1379, 1569, 1586, 1597, 1611, 1468, 1643, 1656, 1645, 1474, 1309, 1511, 1658]
-    cost: 574.0
+    path: [3, 61, 69, 131, 729, 791, 1391, 1987, 1993, 2003, 2599, 2605, 2615, 3213, 3270, 3268, 2667, 2727, 2785, 2795, 3391, 3399, 3461, 4059, 4121, 4717, 4727, 5327, 5925, 5983, 5989]
+    cost: 1212.0
 
-for a search on a 3d grid with 10 nodes along each dimension, where each node is connected to some of its neighbours on the grid via edges with some randomly assigned cost. The grid is taken from graph.zip, a zipped json file with the serialisation of the graph data structs.
-The path is a sequence of edge ids, where the from node id of edge 178 is node id 111, and the to node id of edge 1658 is node id 998.
+for a search on a 3d grid with 10 nodes along each dimension, where each node is connected to all neighbours on the grid via edges with some randomly assigned cost. The grid is taken from graph.zip, a zipped json file with the serialisation of the graph data struct.
+The path is a sequence of edge ids, where the from of edge 3 is node id 0, and the to of edge 5989 is node id 999.
 
-The search uses rayon library to parallelise computations along outgoing edges of a given node, improving performance by about 40% for the example graph used above, from 4.1 seconds to 2.6 seconds on i7-4785T CPU @ 2.20GHz × 4. An artificial delay of 10 milliseconds was added for each advance call to simulate the compute time required to advance state.
+The search uses rayon library to parallelise computations along outgoing edges of a given node, improving performance by about 60% for the example graph used above, from 32 seconds to 12 seconds on i7-4785T CPU @ 2.20GHz × 4. An artificial delay of 10 milliseconds was added for each advance call to simulate the compute time required to advance state. 
+
+Each node has 6 outgoing edges, but on average only 3 are advanced in the search, since the others are terminating at the nodes that have been closed. There are 1000 nodes in the grid, which results in the search taking about 30 seconds, 10 milliseonds per edge. With parallelization, the number of outgoing edges is irrelevant as long as it is less than the number of available cores, which results in about 10 seconds.
