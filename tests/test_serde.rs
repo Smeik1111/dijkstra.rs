@@ -1,39 +1,11 @@
-use dijkstra::graph::{Advance, Graph};
-
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::Path;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct State {
-    name: char,
-    cost: Option<f64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct Props {
-    cost: f64,
-}
-
-impl Advance<State, Props> for State {
-    fn advance(&self, edge_props: &Props) -> State {
-        State {
-            name: self.name,
-            cost: Some(self.cost.unwrap_or(0.0) + edge_props.cost as f64),
-        }
-    }
-    fn update(&mut self, node_state: State) {
-        self.cost = node_state.cost;
-    }
-    fn cost(&self) -> Option<f64> {
-        self.cost
-    }
-}
+use dijkstra::graph::{Advance, Graph};
 
 #[test]
 fn read_and_search() {
-    let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/graph.json");
-    let json = fs::read_to_string(file).expect("failed to read from json file");
+    let file = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/graph.json");
+    let json = std::fs::read_to_string(file).expect("failed to read from json file");
     let mut graph: Graph<State, Props> =
         serde_json::from_str(&json).expect("failed to deserialise graph");
     let path = graph.best_path(0, &[23, 24, 25]).unwrap();
@@ -67,4 +39,30 @@ fn make() {
         serde_json::from_str(&json).expect("failed to deserialise generated graph");
     assert_eq!(graph.num_nodes(), 26);
     assert_eq!(graph.num_edges(), 100);
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct State {
+    name: char,
+    cost: Option<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Props {
+    cost: f64,
+}
+
+impl Advance<State, Props> for State {
+    fn advance(&self, edge_props: &Props) -> State {
+        State {
+            name: self.name,
+            cost: Some(self.cost.unwrap_or(0.0) + edge_props.cost as f64),
+        }
+    }
+    fn update(&mut self, node_state: State) {
+        self.cost = node_state.cost;
+    }
+    fn cost(&self) -> Option<f64> {
+        self.cost
+    }
 }

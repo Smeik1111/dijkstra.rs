@@ -2,32 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use dijkstra::graph::{Advance, Graph};
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct State {
-    name: char,
-    cost: Option<f64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct Props {
-    cost: u8,
-}
-
-impl Advance<State, Props> for State {
-    fn advance(&self, edge_props: &Props) -> State {
-        State {
-            name: self.name,
-            cost: Some(self.cost.unwrap_or(0.0) + edge_props.cost as f64),
-        }
-    }
-    fn update(&mut self, node_state: State) {
-        self.cost = node_state.cost;
-    }
-    fn cost(&self) -> Option<f64> {
-        self.cost
-    }
-}
-
 #[test]
 fn node_state() {
     let mut graph: Graph<State, Props> = Graph::new();
@@ -170,4 +144,30 @@ fn disconnected() {
 
     let path = graph.best_path(a, &[b]);
     assert!(path.is_none());
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+struct State {
+    name: char,
+    cost: Option<f64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+struct Props {
+    cost: u8,
+}
+
+impl Advance<State, Props> for State {
+    fn advance(&self, edge_props: &Props) -> State {
+        State {
+            name: self.name,
+            cost: Some(self.cost.unwrap_or(0.0) + edge_props.cost as f64),
+        }
+    }
+    fn update(&mut self, node_state: State) {
+        self.cost = node_state.cost;
+    }
+    fn cost(&self) -> Option<f64> {
+        self.cost
+    }
 }
