@@ -1,8 +1,7 @@
-use serde::{Deserialize, Serialize};
-use std::{thread, time};
 use std::cmp::min;
 
-use dijkstra::graph::{Advance, Graph, NodeId};
+use dijkstra::graph::{Graph, NodeId};
+use dijkstra::advance::{State, Props};
 
 #[test]
 fn make_grid3d() {
@@ -20,7 +19,7 @@ const N: usize = 10;
 fn grid3d() -> Graph<State, Props> {
     let mut graph: Graph<State, Props> = Graph::new();
     let node_ids = (0..N.pow(3))
-        .map(|_| graph.insert_node(State { cost: None}))
+        .map(|_| graph.insert_node(State { cost: None }))
         .collect::<Vec<_>>();
     for from in node_ids {
         for to in neighbours(from) {
@@ -45,30 +44,4 @@ fn neighbours(id: NodeId) -> Vec<NodeId> {
         id_of(i, j, less(k)),
         id_of(i, j, more(k)),
     ]
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct State {
-    cost: Option<f64>,
-}
-
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-struct Props {
-    cost: u8,
-}
-
-impl Advance<State, Props> for State {
-    fn advance(&self, edge_props: &Props) -> State {
-        // simulating compute time
-        thread::sleep(time::Duration::from_millis(10));
-        State {
-            cost: Some(self.cost.unwrap() + edge_props.cost as f64),
-        }
-    }
-    fn update(&mut self, node_state: State) {
-        self.cost = node_state.cost;
-    }
-    fn cost(&self) -> Option<f64> {
-        self.cost
-    }
 }
