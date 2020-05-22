@@ -1,7 +1,7 @@
 use clap::{App, Arg};
 
+use dijkstra::advance::{Props, State};
 use dijkstra::graph::{Graph, NodeId};
-use dijkstra::advance::{State, Props};
 
 fn main() {
     let (source, targets) = args();

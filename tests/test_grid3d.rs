@@ -1,7 +1,7 @@
 use std::cmp::min;
 
+use dijkstra::advance::{Props, State};
 use dijkstra::graph::{Graph, NodeId};
-use dijkstra::advance::{State, Props};
 
 #[test]
 fn make_grid3d() {

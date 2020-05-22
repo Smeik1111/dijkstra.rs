@@ -36,10 +36,10 @@ pub trait Advance<NodeState, EdgeProps> {
     fn cost(&self) -> Option<f64>;
 }
 
-impl<NodeState, EdgeProps> Graph<NodeState, EdgeProps> 
+impl<NodeState, EdgeProps> Graph<NodeState, EdgeProps>
 where
     NodeState: Sync + Send + Advance<NodeState, EdgeProps>,
-    EdgeProps: Sync
+    EdgeProps: Sync,
 {
     pub fn new() -> Self {
         Graph {

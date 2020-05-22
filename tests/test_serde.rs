@@ -7,7 +7,7 @@ use std::path::Path;
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct State {
     name: char,
-    cost: Option<f64>
+    cost: Option<f64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
