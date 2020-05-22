@@ -1,5 +1,3 @@
-use std::cmp::min;
-
 use dijkstra::advance::{Props, State};
 use dijkstra::graph::{Graph, NodeId};
 
@@ -34,7 +32,7 @@ fn neighbours(id: NodeId) -> Vec<NodeId> {
     let position_of = |id| (id % N, (id / N) % N, id / N / N);
     let id_of = |i, j, k| i + N * (j + N * k);
     let less = |index: usize| index.saturating_sub(1);
-    let more = |index: usize| min(index + 1, N - 1);
+    let more = |index: usize| std::cmp::min(index + 1, N - 1);
     let (i, j, k) = position_of(id);
     vec![
         id_of(less(i), j, k),
