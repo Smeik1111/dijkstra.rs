@@ -1,7 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::Path;
-use std::{thread, time};
 use std::cmp::min;
 
 use dijkstra::graph::{Advance, Graph, NodeId};
@@ -18,8 +15,6 @@ struct Props {
 
 impl Advance<State, Props> for State {
     fn advance(&self, edge_props: &Props) -> State {
-        // simulating compute time
-        thread::sleep(time::Duration::from_millis(10));
         State {
             cost: Some(self.cost.unwrap() + edge_props.cost as f64),
         }
@@ -47,13 +42,11 @@ fn make_grid3d() {
             graph.insert_edge(from, to, Props { cost: cost });
         }
     }
-    let json = serde_json::to_string(&graph).expect("failed to serialise generated graph");
-    let graph: Graph<State, Props> =
-        serde_json::from_str(&json).expect("failed to deserialise generated graph");
     assert_eq!(graph.num_nodes(), 1000);
     assert_eq!(graph.num_edges(), 6_000);
 }
 
+// loopy edges for some nodes are allowed, e.g. nodes on the sides
 fn neighbours(id: NodeId) -> Vec<NodeId> {
     let position_of = |id| (id % N, (id / N) % N, id / N / N);
     let id_of = |i, j, k| i + N * (j + N * k);
