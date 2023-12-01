@@ -5,7 +5,7 @@ on:
     branches:
       - master
   pull_request:
- 
+
 jobs:
   lint:
     name: Lint
@@ -20,18 +20,7 @@ jobs:
           components: clippy
       - name: Build | Lint
         run: cargo clippy
-  compile:
-    name: Compile
-    runs-on: windows-latest
-    steps:
-      - name: Setup | Checkout
-        uses: actions/checkout@v2
-      - name: Setup | Rust
-        uses: ATiltedTree/setup-rust@v1
-        with:
-          rust-version: stable
-      - name: Build | Compile
-        run: cargo check
+
   test:
     name: Test
     strategy:
@@ -49,5 +38,23 @@ jobs:
         uses: ATiltedTree/setup-rust@v1
         with:
           rust-version: ${{ matrix.rust }}
-      - name: Build | Compile
+      - name: Build | Test
         run: cargo test
+
+  compile:
+    name: Compile
+    runs-on: windows-latest
+    steps:
+      - name: Setup | Checkout
+        uses: actions/checkout@v2
+      - name: Setup | Rust
+        uses: ATiltedTree/setup-rust@v1
+        with:
+          rust-version: stable
+      - name: Build | Compile
+        run: cargo build --release
+      - name: Upload Release Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Dijkstra
+          path: target/release/Dijkstra.exe  # Replace with your actual project name
