@@ -22,7 +22,7 @@ jobs:
         run: cargo clippy
   compile:
     name: Compile
-    runs-on: windows
+    runs-on: windows-latest
     steps:
       - name: Setup | Checkout
         uses: actions/checkout@v2
